@@ -66,6 +66,20 @@ Record `context7: installed` or `declined` in config. Proceed either way.
 
 Create `.n8/` per `reference/state.md`: `config.yml` (stack, wiki choice, repo, visibility, context7), an empty `decisions.md` with a header, and `memory/.gitkeep`.
 
+## 8b. Ad-hoc change capture (CLAUDE.md)
+
+Plans go stale when changes happen outside the n8SDLC commands — an ad-hoc conversation that swaps auth providers invalidates every downstream story that assumed the old one. Give future agent sessions a standing instruction to capture this: append to the project's `CLAUDE.md` (create it if absent):
+
+```markdown
+## n8SDLC project
+
+This project is managed by the n8SDLC workflow (GitHub Issues = the plan; `/n8-stat` shows where things stand). If a change made in this session deviates from what planned issues assume — different library, provider, architecture, or dropped/added scope — do two things before finishing:
+1. Append an `## Ad-hoc` entry to `.n8/decisions.md` (format documented in that file's header) naming the change, the why, and the milestones/issues likely affected.
+2. Tell the user which future milestones may now have stale plans and suggest running `/n8-replan`.
+```
+
+Seed `decisions.md`'s header with the ad-hoc entry format from `reference/state.md` so sessions can follow it without the plugin installed.
+
 ## 9. Commit, push, report
 
 Commit everything (`chore: initialize project via n8-init`) and push `main`. Then report a checklist of what was set up, what was skipped and why (honestly — e.g. "secret scanning unavailable on private repos"), and finish with the next step:

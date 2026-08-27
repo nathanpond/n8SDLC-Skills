@@ -47,6 +47,20 @@ Format — one `##` section per skill run, entries appended chronologically:
 
 After execution completes, the exec skill displays all decisions from its run to the user.
 
+### Ad-hoc entries (the drift ledger)
+
+Changes made outside the n8SDLC commands that deviate from planned issues get an `## Ad-hoc` section — this is the primary evidence `/n8-replan`, `/n8-exec`'s preflight, and `/n8-stat` use to detect stale plans. `/n8-init` puts a standing instruction in the project's CLAUDE.md so any agent session writes these.
+
+```markdown
+## Ad-hoc — 2026-08-27
+
+- **Change:** Auth provider switched from Google to Okta.
+  **Why:** Company standardized on Okta for SSO.
+  **Affects:** M4 (auth stories), M6 (admin roles) — plans may be stale.
+```
+
+When `/n8-replan` processes an entry, it appends `— reconciled by /n8-replan <date>` to it so drift checks stop flagging it. Unreconciled entries + unexecuted planned milestones = suspected drift.
+
 ## memory/
 
 Free-form markdown memories — anything worth remembering across sessions that isn't planning state: quirks of the deployment target, user preferences discovered mid-project, external service credentials *locations* (never the credentials themselves), lessons learned. One topic per file, short kebab-case names. Check for an existing file on the topic before creating a new one.

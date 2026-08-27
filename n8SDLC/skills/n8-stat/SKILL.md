@@ -35,9 +35,11 @@ Stage: <stage>
 | M0: Infrastructure | ✅ | ✅ | ✅ closed | |
 | M1: Core API | ✅ 8 stories | 🔶 6/8 | — | 2 blocked |
 
-⚠ Attention: <blocked issues with their questions; failed verifications; unmerged milestone PRs; open confirmed bugs>
+⚠ Attention: <blocked issues with their questions; failed verifications; unmerged milestone PRs; open confirmed bugs; suspected plan drift>
 
 ➡ Next: /n8-<command> — <one line on why>
 ```
 
 The Attention section only appears when something needs the user. Blocked issues show their actual question inline — the user should be able to unblock straight from this readout without clicking through.
+
+**Drift check (cheap, ledger-based):** scan `.n8/decisions.md` for `## Ad-hoc` entries not marked reconciled. Any that exist while planned-but-unexecuted milestones remain → Attention line naming the change and affected milestones, suggesting `/n8-replan <M>`. Don't deep-scan the codebase here — that's replan's job; stat stays fast.

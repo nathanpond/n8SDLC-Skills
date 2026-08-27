@@ -16,6 +16,7 @@ Resolve targets (`M0`, `M1,M2`, or `*` = all planned, unexecuted milestones), th
 
 - **Planned:** every targeted milestone has stories. If not → tell the user which milestone is unplanned, suggest `/n8-plan <M>`, and stop.
 - **In order:** every earlier milestone is already executed (its stories closed / milestone PR merged). If not → tell the user which milestone must run first and stop. Milestones build on each other; out-of-order execution produces integration debt.
+- **Not stale:** run a drift check on the targeted milestones — plans age, and executing a stale plan faithfully builds the wrong thing. Check (a) unreconciled `## Ad-hoc` entries in `.n8/decisions.md` naming these milestones or their subject areas, and (b) spot-check each story/subtask's concrete claims (files, libraries, providers) against the current codebase. Pure implementation-detail staleness (a renamed file, a moved module) → adjust inline, log the correction, proceed. Anything touching **AC or story validity** (e.g. auth provider swapped since planning) → hard stop for that milestone: report the drift and recommend `/n8-replan <M>`.
 
 ## 2. Per milestone
 

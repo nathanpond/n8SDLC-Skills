@@ -18,6 +18,12 @@ Decisions made 2026-08-27 while designing this skill suite. This is the record o
 - Blockers (legitimately unsure + high cost of wrong): **skip, mark `blocked`, continue** with non-dependent work; surface all at the end. Low-cost calls are made and logged, not asked.
 - All decisions logged to `.n8/decisions.md` and displayed after execution.
 
+## Drift and replanning
+- Ad-hoc changes between planning and execution are captured in a **drift ledger**: `## Ad-hoc` entries in `.n8/decisions.md`, written by any agent session via a CLAUDE.md instruction that `/n8-init` installs.
+- Detection runs at **exec preflight** (minor implementation staleness → fix inline and log; AC/story-level drift → hard stop, recommend replan) and in **/n8-stat** (cheap ledger scan only).
+- **/n8-replan** (targets like exec; default = all planned-but-unexecuted milestones) gathers evidence from the ledger **plus git history since planning plus codebase spot-checks**, then **proposes a full change set and applies on approval** (AC rewrites called out; epic-level AC changes flagged prominently). Executed milestones are never rewritten — drift affecting shipped work becomes new stories.
+- Reconciled ledger entries are stamped (`— reconciled by /n8-replan <date>`) so they stop flagging.
+
 ## Verification
 - Milestone args + wildcard, like exec; no args = executed-but-unverified.
 - `--auto` (default) verifies all the agent can; `--testplan` yields manual steps. Un-verifiable items always become manual steps needing user approval.
