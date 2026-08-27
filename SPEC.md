@@ -97,6 +97,11 @@ Trimmed middle path (decided 2026-08-27 after the label-philosophy discussion): 
 - Resolution rules: **harvest before removing** (mine hard-won knowledge into .n8/memory//wiki/kept skills first — losing it is the real cost); removal only per-item with user approval, via git so it's one revert away; CLAUDE.md edited surgically (workflow sections replaced, everything else untouched); nothing outside n8SDLC's domains is touched.
 - Label safety (motivated by the n8PDF collision case): labels aren't git-tracked, so init diffs existing labels and asks before any `--force` overwrite of differing color/description; never deletes labels it didn't create; confirms templates/milestones on repos with real issue history.
 
+## Upstream feedback loop (decided 2026-08-27)
+- **/n8-feedback**: skill learnings from downstream projects flow back to the plugin repo as `field-report` issues. Capture moment = the CLAUDE.md section init installs ("if a skill misled you, offer /n8-feedback").
+- Privacy design: sanitize **by construction** (draft written generically — skill text quotable, project specifics never present), then an absolute **preview gate** — the complete title+body shown verbatim, explicit approval required per-session, files under the user's own GitHub account. Declined → learning saved to project `.n8/memory/` instead.
+- Fingerprint dedupe against the plugin repo (`<skill>|<slug>`): open match → previewed confirmation comment; closed match → check whether main already carries the fix.
+
 ## Security-finding routing (decided 2026-08-27)
 - **Init-time user choice**, `security_findings: issues | advisories` in `.n8/config.yml` (asked only on public repos — private-repo issues are already maintainer-only):
   - `issues` — public register under the `security` label; full milestone/fingerprint integration. Right for libraries/tools.

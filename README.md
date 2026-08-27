@@ -13,7 +13,7 @@ Two convictions drive the design:
 
 ## Core features
 
-- **Full lifecycle in 15 commands** — init, brownfield mapping, roadmap, granular planning, drift repair, autonomous execution, adversarial verification, releases, an 8-dimension audit suite, wiki upkeep, status, quick capture, persistent debugging, project-skill building, and help.
+- **Full lifecycle in 16 commands** — init, brownfield mapping, roadmap, granular planning, drift repair, autonomous execution, adversarial verification, releases, an 8-dimension audit suite, wiki upkeep, status, quick capture, persistent debugging, project-skill building, help, and an upstream feedback loop (`/n8-feedback`: skill learnings from any project flow back to the plugin as sanitized, user-approved issues).
 - **Autonomous execution that finishes** — milestone branches with one PR each, dependency-ordered stories, tests written and passing as part of every story, a deviation rulebook for discovered work (fix bugs and missing correctness automatically; stop only for architectural forks), and blockers that get labeled and skipped, never stalled on.
 - **Structural verification** — every story carries a goal-backward "must-haves" contract (truths → artifacts → key links) that verification cashes with an exists/substantive/wired check; snapshots regenerated to make tests pass are treated as claims, not results. Verification closes milestones; nothing else does.
 - **Drift detection and repair** — ad-hoc changes made in any session get captured to a ledger (via a CLAUDE.md instruction installed at init), surfaced by status and execution preflight, and repaired by `/n8-replan` using three evidence sources: the ledger, git history, and the codebase itself.
@@ -84,6 +84,7 @@ Claude Code will prompt to trust the marketplace on first use.
 | `/n8-debug` | Systematic debugging with a GitHub issue as the persistent investigation brain. |
 | `/n8-skill` | Build a project-specific skill into the repo's `.claude/skills/`. |
 | `/n8-help` | This table, live, annotated with your project's current state. |
+| `/n8-feedback` | Feed a plugin learning back upstream — sanitized of project specifics, previewed in full, sent only on your approval. |
 
 ## How the workflow works
 

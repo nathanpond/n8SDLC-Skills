@@ -30,5 +30,6 @@ Open and close with the one thing the user should remember:
 | `/n8-debug` | Systematic debugging with a GitHub issue as the persistent brain — hypotheses, evidence, and eliminated dead ends survive context resets. |
 | `/n8-skill` | Builds a project-specific skill into this repo's `.claude/skills/` (also suggested by planning when a pattern warrants one). |
 | `/n8-help` | This reference. |
+| `/n8-feedback` | Report a plugin defect/gap upstream — fully previewed, nothing sent without approval. |
 
 Keep the summaries to this table's altitude — the commands' own skills carry the detail. If the user asks "which one do I run now?", don't guess from the table: run the `/n8-stat` logic and answer from the project's actual state.

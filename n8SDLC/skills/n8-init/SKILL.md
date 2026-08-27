@@ -122,6 +122,8 @@ Plans go stale when changes happen outside the n8SDLC commands — an ad-hoc con
 This project is managed by the n8SDLC workflow (GitHub Issues = the plan; `/n8-stat` shows where things stand). If a change made in this session deviates from what planned issues assume — different library, provider, architecture, dropped/added scope, or amending a declared invariant below — do two things before finishing:
 1. Append an `## Ad-hoc` entry to `.n8/decisions.md` (format documented in that file's header) naming the change, the why, and the milestones/issues likely affected.
 2. Tell the user which future milestones may now have stale plans and suggest running `/n8-replan`.
+
+Separately: if a `/n8-*` skill's own instructions failed, misled you, or were silent on something this session, tell the user and offer `/n8-feedback` — it packages the learning as an issue on the plugin repo, stripped of project specifics, and sends nothing until the user has reviewed the exact text.
 ```
 
 Seed `decisions.md`'s header with the ad-hoc entry format from `reference/state.md` so sessions can follow it without the plugin installed.
