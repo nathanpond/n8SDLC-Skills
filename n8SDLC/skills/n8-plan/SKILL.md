@@ -21,6 +21,8 @@ Parse the argument: a single milestone (`M0`), a comma list (`M1,M2`), or `*` (a
 
 First, sweep `needs-triage` issues (quick captures from `/n8-file` and discovered-work filings): for each, propose with the user whether it becomes a story in a targeted milestone, folds into an existing issue's AC, or waits. Triage is planning's job — captures shouldn't accumulate.
 
+When planning M0 or the CI milestone, check the project invariants in CLAUDE.md: every invariant marked test-enforced needs a story creating its **executable guard** (a test or build setting that fails when the invariant is breached — package-count test, public-API snapshot, warnings-as-errors). If a guard story is missing, add it and update the invariant's marking once it lands.
+
 For each milestone, study its epics and phases, then ask everything execution would otherwise have to guess. Themes that recur:
 
 - Concrete technology and library choices (verify current APIs/versions via context7 when available — plans built on stale docs produce broken code).
