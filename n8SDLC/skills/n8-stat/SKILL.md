@@ -16,8 +16,8 @@ Check in order — the first missing thing marks the stage:
 1. **Not initialized** — no `.n8/config.yml` (or no git repo / labels) → next: `/n8-init`
 2. **No roadmap** — no `epic`-labeled issues or no milestones → next: `/n8-roadmap`
 3. **Planning** — milestones exist but some **non-Audit** milestones have no stories → next: `/n8-plan <first unplanned>` (note `*` plans all). The Audit milestone is expected to be storyless — it gets stories from `/n8-audit`, never from `/n8-plan`, so it never triggers this stage.
-4. **Executing** — planned milestones with open, unblocked stories and no merged milestone PR → next: `/n8-exec <first unexecuted>`
-5. **Verifying** — milestones with all stories closed but still open → next: `/n8-verify <M>`
+4. **Verifying** — milestones with all stories closed but still open → next: `/n8-verify <M>`. Verification debt outranks new execution — defects found late compound into every milestone built on top of them.
+5. **Executing** — planned milestones with open, unblocked stories and no merged milestone PR → next: `/n8-exec <first unexecuted>`
 6. **Auditing** — only the Audit milestone remains → next: `/n8-audit`
 7. **Releasable** — verified-closed shippable milestones with no release tag covering them (`gh release list` vs. milestone close dates) → next: `/n8-release`
 8. **Done** — all milestones closed and released → suggest `/n8-wiki` for a final reconcile, and congratulate honestly.

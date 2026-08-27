@@ -6,7 +6,7 @@ Shared conventions for every n8SDLC skill. All GitHub operations go through the 
 
 GitHub is the source of truth for all planning state. Before creating anything (label, milestone, issue), check whether it already exists — every operation in this workflow must be safe to re-run.
 
-Set `R=$(gh repo view --json nameWithOwner --jq .nameWithOwner)` once and reuse it.
+Set `R=$(gh repo view --json nameWithOwner --jq .nameWithOwner)` once and reuse it — and in agent contexts where the working directory can reset between commands, pass `-R $R` explicitly: a bare `gh issue edit 1` run from the wrong cwd resolves against the wrong repo and fails with a misleading "could not resolve" error.
 
 ## Labels
 
