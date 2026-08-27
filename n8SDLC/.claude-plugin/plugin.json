@@ -1,7 +1,7 @@
 {
   "name": "n8sdlc",
   "version": "0.1.0",
-  "description": "SDLC workflow for coding-agent projects: /n8-init, /n8-roadmap, /n8-plan, /n8-exec, /n8-verify, /n8-audit, /n8-wiki, /n8-stat, /n8-skill. GitHub Issues is the planning backbone (native sub-issues, milestones, dependencies); a .n8/ directory holds decisions and memory that don't fit GitHub.",
+  "description": "SDLC workflow for coding-agent projects: /n8-init, /n8-roadmap, /n8-plan, /n8-replan, /n8-exec, /n8-verify, /n8-release, /n8-audit, /n8-wiki, /n8-stat, /n8-skill, /n8-file. GitHub Issues is the planning backbone (native sub-issues, milestones, dependencies); a .n8/ directory holds decisions and memory that don't fit GitHub.",
   "author": {
     "name": "Nathan Pond",
     "email": "claude@npond.com"

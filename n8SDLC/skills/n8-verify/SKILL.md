@@ -40,6 +40,6 @@ Then offer to run a fix pass immediately (`/n8-exec` scoped to the new bugs on a
 
 A milestone passes when: every AC is verified (agent-verified or user-approved manual steps), promised tests exist and pass, and no open `confirmed` bugs remain in it. Then close the milestone (`gh api -X PATCH repos/$R/milestones/<id> -f state=closed`).
 
-When a closed milestone represents shippable value (feature milestones especially, and always the final one), **offer a release**: `gh release create <tag> --title <tag> --generate-notes` — release notes generate from merged PR titles, which is one reason PR titles carry their issue numbers. The user decides tag and timing; don't release unasked.
+When a closed milestone represents shippable value (feature milestones especially, and always the final one), **suggest `/n8-release`** — it handles version selection, tagging the verified commit on main, generated notes, and whatever the tag triggers (production deploy, publish). Never release unasked; the suggestion is the offer.
 
 Report per milestone: verified AC count, evidence highlights, manual steps awaiting the user (if any), bugs filed, closed or still open and why — honestly; a milestone that limps through is reported as such. Suggest the next step: fix pass, remaining verifications, next `/n8-exec`, or `/n8-audit` if all feature milestones are done.

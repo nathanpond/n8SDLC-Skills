@@ -19,7 +19,8 @@ Check in order — the first missing thing marks the stage:
 4. **Executing** — planned milestones with open, unblocked stories and no merged milestone PR → next: `/n8-exec <first unexecuted>`
 5. **Verifying** — milestones with all stories closed but still open → next: `/n8-verify <M>`
 6. **Auditing** — only the Audit milestone remains → next: `/n8-audit`
-7. **Done** — all milestones closed → suggest `/n8-wiki` for a final reconcile, and congratulate honestly.
+7. **Releasable** — verified-closed shippable milestones with no release tag covering them (`gh release list` vs. milestone close dates) → next: `/n8-release`
+8. **Done** — all milestones closed and released → suggest `/n8-wiki` for a final reconcile, and congratulate honestly.
 
 Stages overlap in real projects (M1 verifying while M3 is unplanned) — report the full picture, then pick the single most useful next command (unblock before advancing: blocked issues and failed verifications outrank starting new work).
 

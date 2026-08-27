@@ -22,6 +22,7 @@ claude plugin install n8sdlc@n8sdlc-skills
 | `/n8-audit` | Audit suite: security, stability, performance, cleanup, authorization, 508, test coverage. Stack-appropriate tooling (CodeQL, semgrep, dependency audits, fuzzing where applicable), per-dimension concern checklists, a shared severity rubric, verified findings only. Reports findings, asks which to file — fingerprinted so re-runs dedupe, detect regressions, and produce deltas. |
 | `/n8-file` | Quick capture: file a bug/task as a `needs-triage` issue in under a minute (duplicate-checked, code-anchored) without losing your place. Triage happens at the next planning pass. |
 | `/n8-wiki` | Full reconcile of the wiki against backlog + codebase. Human, informational tone; honest by default, never oversells. Optional — respects opt-out. |
+| `/n8-release` | Cut a release: tag a verified commit on main, GitHub release with notes generated from merged PR titles, and watch whatever the tag triggers (production deploy, publish). Hard preconditions: milestones verified-closed, CI green. Never runs unasked. |
 | `/n8-stat` | Where you are in the process, live from GitHub, plus the suggested next command. |
 | `/n8-skill` | Build a project-specific skill into the project's `.claude/skills/` (also offered by `/n8-plan`'s analysis). |
 
