@@ -33,7 +33,8 @@ Either way, wire the stack's **analyzers/linters into the build** from day one (
 ## 4. Labels and issue templates
 
 - Create the baseline label set from `reference/github.md` using `--force` (idempotent).
-- Write `.github/ISSUE_TEMPLATE/` templates for **epic**, **story**, and **bug** matching the body templates in `reference/github.md`, plus a `config.yml` with `blank_issues_enabled: true`.
+- Generate the project's **`area:*` labels** from its actual top-level structure (mapped to directories, not teams — e.g. `area:web`, `area:api`, `area:db`, `area:ci`, `area:infra`, `area:docs`), confirm the set with the user, create them, and record it under `areas:` in `.n8/config.yml`. Every issue filed by the workflow carries exactly one.
+- Write `.github/ISSUE_TEMPLATE/` templates for **epic**, **story**, and **bug** matching the body templates in `reference/github.md`, plus a `config.yml` with `blank_issues_enabled: false` — every issue arrives typed, whether filed by a human or an agent.
 
 ## 5. Wiki
 

@@ -41,6 +41,6 @@ Stage: <stage>
 ➡ Next: /n8-<command> — <one line on why>
 ```
 
-The Attention section only appears when something needs the user. Blocked issues show their actual question inline — the user should be able to unblock straight from this readout without clicking through.
+The Attention section only appears when something needs the user. Blocked issues show their actual question inline — the user should be able to unblock straight from this readout without clicking through. List `needs-owner-action` issues first: those are, by definition, waiting on exactly the person reading this.
 
 **Drift check (cheap, ledger-based):** scan `.n8/decisions.md` for `## Ad-hoc` entries not marked reconciled. Any that exist while planned-but-unexecuted milestones remain → Attention line naming the change and affected milestones, suggesting `/n8-replan <M>`. Don't deep-scan the codebase here — that's replan's job; stat stays fast.

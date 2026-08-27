@@ -36,7 +36,7 @@ Resolve targets (`M0`, `M1,M2`, or `*` = all planned, unexecuted milestones), th
 
 Ask nothing mid-run. When you legitimately don't know how to proceed **and the cost of guessing wrong is high** (schema shape, security posture, destructive/irreversible steps, external spend, breaching a declared project invariant):
 
-1. Comment the specific question and the options you considered on the issue; add the `blocked` label.
+1. Comment the specific question and the options you considered on the issue; add the `blocked` label — plus `needs-owner-action` when what it waits on is the user (access, credentials, a call only they can make), so the open-issue list reads honestly about what an agent can still act on.
 2. Log it in `.n8/decisions.md` as a blocker entry.
 3. Move on to work that doesn't depend on the blocked story. Dependents of a blocked story are blocked too — mark them, don't half-build them.
 
