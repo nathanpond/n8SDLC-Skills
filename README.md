@@ -27,6 +27,7 @@ claude plugin install n8sdlc@n8sdlc-skills
 | `/n8-release` | Cut a release: tag a verified commit on main, GitHub release with notes generated from merged PR titles, and watch whatever the tag triggers (production deploy, publish). Hard preconditions: milestones verified-closed, CI green. Never runs unasked. |
 | `/n8-stat` | Where you are in the process, live from GitHub, plus the suggested next command. |
 | `/n8-skill` | Build a project-specific skill into the project's `.claude/skills/` (also offered by `/n8-plan`'s analysis). |
+| `/n8-help` | The command reference — every command with a one-liner, and the reminder that `/n8-stat` always shows where you are. |
 
 First-class stacks for init scaffolding: **.NET/C#, TypeScript/Node, Python, Unity, Dart/Flutter** (others handled generically).
 
