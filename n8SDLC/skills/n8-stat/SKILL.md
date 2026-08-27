@@ -15,7 +15,7 @@ Check in order — the first missing thing marks the stage:
 
 1. **Not initialized** — no `.n8/config.yml` (or no git repo / labels) → next: `/n8-init`
 2. **No roadmap** — no `epic`-labeled issues or no milestones → next: `/n8-roadmap`
-3. **Planning** — milestones exist but some have no stories → next: `/n8-plan <first unplanned>` (note `*` plans all)
+3. **Planning** — milestones exist but some **non-Audit** milestones have no stories → next: `/n8-plan <first unplanned>` (note `*` plans all). The Audit milestone is expected to be storyless — it gets stories from `/n8-audit`, never from `/n8-plan`, so it never triggers this stage.
 4. **Executing** — planned milestones with open, unblocked stories and no merged milestone PR → next: `/n8-exec <first unexecuted>`
 5. **Verifying** — milestones with all stories closed but still open → next: `/n8-verify <M>`
 6. **Auditing** — only the Audit milestone remains → next: `/n8-audit`
@@ -43,4 +43,4 @@ Stage: <stage>
 
 The Attention section only appears when something needs the user. Blocked issues show their actual question inline — the user should be able to unblock straight from this readout without clicking through. List `needs-owner-action` issues first: those are, by definition, waiting on exactly the person reading this.
 
-**Drift check (cheap, ledger-based):** scan `.n8/decisions.md` for `## Ad-hoc` entries not marked reconciled. Any that exist while planned-but-unexecuted milestones remain → Attention line naming the change and affected milestones, suggesting `/n8-replan <M>`. Don't deep-scan the codebase here — that's replan's job; stat stays fast.
+**Drift check (cheap, ledger-based):** scan `.n8/decisions.md` for `## Ad-hoc` entries not marked reconciled — ignoring matches inside fenced code blocks (the file's header embeds the entry format as an example). Any that exist while planned-but-unexecuted milestones remain → Attention line naming the change and affected milestones, suggesting `/n8-replan <M>`. Don't deep-scan the codebase here — that's replan's job; stat stays fast.
