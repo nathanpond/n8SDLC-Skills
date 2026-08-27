@@ -1,36 +1,107 @@
-# n8SDLC Skills
+# n8SDLC
 
-A reusable SDLC process for building projects with coding agents, packaged as a Claude Code plugin. GitHub Issues is the planning backbone (epics → stories → subtasks via native sub-issues, milestones, dependencies); a small tracked `.n8/` directory holds decisions and memory that don't fit GitHub.
+A complete, reusable SDLC for building software with coding agents — packaged as a Claude Code plugin.
+
+## Mission
+
+Coding agents are excellent at *doing* and unreliable at *remembering, sequencing, and finishing*. n8SDLC closes that gap: it turns a project idea into a fully planned backlog on GitHub Issues, executes it autonomously milestone by milestone, and refuses to call anything done until it has been adversarially verified. Every decision is logged, every plan survives context resets and session changes, and when reality diverges from the plan — an architecture swap, a changed direction — the workflow detects the drift and repairs the plan instead of faithfully building the wrong thing.
+
+Two convictions drive the design:
+
+1. **GitHub is the only source of truth.** Plans live as issues (epics → stories → subtasks via native sub-issues), phases as milestones, order as dependencies. No parallel plan files to drift, no state directories to migrate. A small tracked `.n8/` folder holds only what GitHub can't: config answers, the decision log, memories.
+2. **Never trust the agent's self-report.** Plans are written so execution needs to ask nothing; verification is done by a different pass that checks what actually exists (real files, real wiring, real behavior) against user-observable truths recorded at planning time — because "task completed" and "goal achieved" are different claims.
+
+## Core features
+
+- **Full lifecycle in 15 commands** — init, brownfield mapping, roadmap, granular planning, drift repair, autonomous execution, adversarial verification, releases, an 8-dimension audit suite, wiki upkeep, status, quick capture, persistent debugging, project-skill building, and help.
+- **Autonomous execution that finishes** — milestone branches with one PR each, dependency-ordered stories, tests written and passing as part of every story, a deviation rulebook for discovered work (fix bugs and missing correctness automatically; stop only for architectural forks), and blockers that get labeled and skipped, never stalled on.
+- **Structural verification** — every story carries a goal-backward "must-haves" contract (truths → artifacts → key links) that verification cashes with an exists/substantive/wired check; snapshots regenerated to make tests pass are treated as claims, not results. Verification closes milestones; nothing else does.
+- **Drift detection and repair** — ad-hoc changes made in any session get captured to a ledger (via a CLAUDE.md instruction installed at init), surfaced by status and execution preflight, and repaired by `/n8-replan` using three evidence sources: the ledger, git history, and the codebase itself.
+- **Fingerprinted, idempotent audits** — security, authorization, stability, performance, cleanup, 508 accessibility, test coverage, and integration wiring; findings carry severity and a stable fingerprint so re-runs produce deltas and detect regressions instead of filing duplicates. Security findings route to public issues or maintainer-only draft advisories, your call at init.
+- **Honest by default** — the wiki reconciler and every report are bound to a no-overselling rule: planned is "planned", broken is stated, and performance claims need a measured number or they don't get written.
+- **Battle-tested** — the conventions were mined from real projects (a 184-issue library backlog, a production audit suite, a shipped two-repo product) and the skills themselves were live-tested end to end on throwaway repos: planned, executed, verified, audited, drifted, replanned, and released for real, with every failure fixed back into the skills.
 
 ## Install
+
+Requires the [`gh` CLI](https://cli.github.com) (2.94.0+), authenticated (`gh auth login`). The [context7 MCP](https://github.com/upstash/context7) is strongly recommended — planning uses it to check current docs before committing to libraries — but not required.
+
+**Whole machine** (the commands become available in every project):
 
 ```bash
 claude plugin marketplace add nathanpond/n8SDLC-Skills
 claude plugin install n8sdlc@n8sdlc-skills
 ```
 
-## The workflow
+**Single project** (checked into the repo, so anyone opening it — human or agent — gets the plugin): add to the project's `.claude/settings.json`:
 
-| Command | What it does |
+```json
+{
+  "extraKnownMarketplaces": {
+    "n8sdlc-skills": {
+      "source": { "source": "github", "repo": "nathanpond/n8SDLC-Skills" }
+    }
+  },
+  "enabledPlugins": { "n8sdlc@n8sdlc-skills": true }
+}
+```
+
+Claude Code will prompt to trust the marketplace on first use.
+
+## Getting started
+
+**New project:** create a repo on GitHub, make an empty local folder, then:
+
+```
+/n8-init        → answers a few setup questions, scaffolds the shell project, wires everything
+/n8-roadmap     → describe the goal and features; get epics + a milestone skeleton
+/n8-plan *      → deep Q&A now so execution never asks; full backlog created
+/n8-exec *      → walk away; it builds, tests, and merges milestone by milestone
+/n8-verify      → adversarial check against the plan's own truths; closes what passes
+/n8-audit       → the audit suite, then /n8-exec the fixes
+/n8-release     → tag a verified commit; ship
+```
+
+**Existing codebase:** same flow, but run `/n8-map` between init and roadmap — four parallel agents document the stack, architecture, conventions, and concerns (concerns become backlog issues), so planning happens against what's actually there. Init also scans for pre-existing homegrown workflows and reconciles them with your approval instead of clobbering them.
+
+**Anytime:** `/n8-stat` shows exactly where you are and the next command — safe to run whenever you're lost. `/n8-help` lists everything. `/n8-file` captures a stray bug or idea in under a minute without derailing what you're doing.
+
+## Command reference
+
+| Command | One line |
 |---|---|
-| `/n8-init` | First command. Shell project (or scaffold one), git repo + your GitHub remote, baseline labels + issue templates, wiki check/seed, security features (public repos), recommends context7 MCP. On projects with a pre-existing homegrown workflow: scans for conflicting skills/conventions, harvests their knowledge, and removes them only with per-item approval. |
-| `/n8-map` | Brownfield mapping: four parallel agents document an existing codebase's stack, architecture, conventions, and concerns into the wiki — written prescriptively for future executors; concerns become triaged issues. Run before `/n8-roadmap` on codebases that predate n8SDLC. |
-| `/n8-roadmap` | Describe the app's goal, features, and AC. Clarifying Q&A → epics (epic-level AC) + milestone skeleton: M0 Infrastructure always first, CI early, Audit always last. |
-| `/n8-plan M0` | Granular milestone planning (`M1,M2`, `*` supported). Deep Q&A so execution never has to ask. Stories (the what + AC + test plans) under epics, subtasks (the how) under stories, dependencies wired. Post-analysis suggests specialized audits and project skills. |
-| `/n8-exec M0` | Autonomous execution (`M1,M2`, `*` supported). Branch + PR per milestone, tests written and passing, every decision logged and reported. Blockers: skip, mark `blocked`, continue, surface at the end. Stops if targets are unplanned or out of order. |
-| `/n8-replan` | Reconcile stale plans after ad-hoc changes (e.g. auth swapped Google → Okta after M0–M3 shipped). Gathers evidence from the ad-hoc ledger, git history, and codebase; proposes per-issue AC/subtask updates, closures, and new stories; applies on approval. Exec's preflight hard-stops on substantive drift and points here; `/n8-stat` flags unreconciled ad-hoc changes. |
-| `/n8-verify` | Verify against AC (`--auto` agent-verifies everything it can; `--testplan` gives you manual steps). Un-verifiable steps become manual steps for your approval. Failures → confirmed bugs + offered re-exec. Passing verify is what closes a milestone. |
-| `/n8-audit` | Audit suite: security, stability, performance, cleanup, authorization, 508, test coverage. Stack-appropriate tooling (CodeQL, semgrep, dependency audits, fuzzing where applicable), per-dimension concern checklists, a shared severity rubric, verified findings only. Reports findings, asks which to file — fingerprinted so re-runs dedupe, detect regressions, and produce deltas. Security findings route to public issues or maintainer-only draft advisories per the init-time choice. |
-| `/n8-file` | Quick capture: file a bug/task as a `needs-triage` issue in under a minute (duplicate-checked, code-anchored) without losing your place. Triage happens at the next planning pass. |
-| `/n8-debug` | Systematic debugging with a GitHub issue as the persistent brain — falsifiable hypotheses, appended evidence, and an "Eliminated" trail that survives context resets. Closes with a regression test that reproduces the bug. |
-| `/n8-wiki` | Full reconcile of the wiki against backlog + codebase. Human, informational tone; honest by default, never oversells. Optional — respects opt-out. |
-| `/n8-release` | Cut a release: tag a verified commit on main, GitHub release with notes generated from merged PR titles, and watch whatever the tag triggers (production deploy, publish). Hard preconditions: milestones verified-closed, CI green. Never runs unasked. |
-| `/n8-stat` | Where you are in the process, live from GitHub, plus the suggested next command. |
-| `/n8-skill` | Build a project-specific skill into the project's `.claude/skills/` (also offered by `/n8-plan`'s analysis). |
-| `/n8-help` | The command reference — every command with a one-liner, and the reminder that `/n8-stat` always shows where you are. |
+| `/n8-init` | Set up everything: scaffold, git + remote, labels, templates, wiki, security features, conventions scan on brownfield repos. |
+| `/n8-map` | Document an existing codebase (stack/architecture/conventions/concerns) before planning on it. |
+| `/n8-roadmap` | Goal + features → epics and the milestone skeleton. |
+| `/n8-plan` | Milestones → fully specified stories, subtasks, tests, dependencies (`M0`, `M1,M2`, `*`). |
+| `/n8-replan` | Repair plans that drifted from reality; propose-then-apply. |
+| `/n8-exec` | Execute planned milestones autonomously (`M0`, `M1,M2`, `*`). |
+| `/n8-verify` | Adversarial verification against AC and must-haves (`--auto` / `--testplan`); closes milestones. |
+| `/n8-audit` | Security, authorization, stability, performance, cleanup, 508, tests, integration — fingerprinted findings. |
+| `/n8-release` | Tag a verified commit on main; notes from merged PRs; watch what the tag triggers. |
+| `/n8-wiki` | Reconcile the whole wiki against backlog + code, honestly. |
+| `/n8-stat` | Where you are, what needs attention, what to run next. |
+| `/n8-file` | Capture a bug/idea as a triaged-later issue in under a minute. |
+| `/n8-debug` | Systematic debugging with a GitHub issue as the persistent investigation brain. |
+| `/n8-skill` | Build a project-specific skill into the repo's `.claude/skills/`. |
+| `/n8-help` | This table, live, annotated with your project's current state. |
 
-First-class stacks for init scaffolding: **.NET/C#, TypeScript/Node, Python, Unity, Dart/Flutter** (others handled generically).
+## How the workflow works
 
-Requires the `gh` CLI, authenticated. The context7 MCP is strongly recommended (planning/execution use it for current docs) but not required.
+The lifecycle is a pipeline with hard gates:
 
-Design decisions behind all of this are recorded in [SPEC.md](SPEC.md).
+```
+init → (map) → roadmap → plan ⇄ replan → exec → verify → audit → release
+                                  ↑______ drift detection ______↓
+```
+
+- **Planning front-loads every question.** Roadmap captures the goal, deployment targets, and a handful of project *invariants* (constraints no story may breach — enforced by guard tests where possible). Planning interrogates each milestone until an agent with no user access could build every story from its issue alone — vertical slices, testable acceptance criteria, a test plan per story, and recorded "Claude's Discretion" zones where you've delegated the call. M0 is always infrastructure, CI comes first, and an Audit milestone always sits last.
+- **Execution is deliberately unattended.** A question during execution is treated as a planning failure. Real blockers get labeled (`blocked`, plus `needs-owner-action` when only you can resolve it), logged, and skipped; everything else proceeds. All work lands through milestone PRs gated on CI, and every judgment call is written to the decision log and shown to you afterward.
+- **Done is earned twice.** Execution merging is not done; verification is — it re-derives what each story promised and checks the code, the wiring, and the running behavior, handing you a conversational test script only for what an agent genuinely can't check. Then the audit suite hunts what verification's story-by-story lens can't see (cross-cutting security, wiring orphans, coverage gaps), and its findings flow back through the same exec → verify loop.
+- **Change is expected.** When any session — inside the workflow or not — changes something the plan assumed, the change gets logged to the drift ledger and `/n8-replan` rewrites the affected stories, closes invalidated ones, and adds what's newly missing, all proposed to you before anything is touched.
+- **Releases are tags on main.** Milestone PRs merge continuously; a release stamps a verified commit, generates notes from the merged PRs, and triggers whatever your CI wired to tags. Never automatic.
+
+Design decisions and their reasoning are recorded in [SPEC.md](SPEC.md) — including what was deliberately rejected, so the choices survive future re-litigation.
+
+## License
+
+[MIT](LICENSE) © 2026 Nathan Pond
