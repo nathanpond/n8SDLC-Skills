@@ -9,8 +9,10 @@ Ask which shape: web app (default Vite + React unless the user prefers Next.js/o
 ```bash
 npm create vite@latest <name> -- --template react-ts     # web app
 npx create-next-app@latest <name> --typescript           # Next.js
-npm init -y && npm i -D typescript @types/node && npx tsc --init   # service/library base
+npm init -y && npm i -D typescript @types/node && npx tsc --init   # service/library/CLI base
 ```
+
+CLI shape: no dedicated generator — use the base above plus a `bin` entry in `package.json` pointing at the built entry (`dist/cli.js` with a `#!/usr/bin/env node` shebang), `src/` layout, tsc build.
 
 Ask npm vs pnpm; default npm unless a lockfile says otherwise. Add Vitest for unit tests and Playwright for e2e when the app has a UI.
 

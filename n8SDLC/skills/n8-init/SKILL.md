@@ -24,6 +24,8 @@ Inspect the folder for an existing project using the detection markers in `${CLA
 
 Either way, wire the stack's **analyzers/linters into the build** from day one (the stack file's Tests/quality section names them) — build-time analysis is the always-on layer the audits lean on. Where rules get tuned down, the suppression config carries a one-line rationale per rule; audits treat unexplained suppressions as findings.
 
+Write a minimal, honest README: name, one-line purpose, how to build and test. The repo shouldn't land on GitHub without a landing page; it grows from here.
+
 ## 3. Git repo and remote
 
 - `git init -b main` if not already a repo.
@@ -58,23 +60,34 @@ Touch nothing outside n8SDLC's domains — a project's unrelated skills, hooks, 
 
 - Create the baseline label set from `reference/github.md` using `--force` (idempotent) — **but diff first on a repo that already has labels**: labels aren't git-tracked, so a `--force` overwrite of an existing label's color/description is silent, unrecoverable data loss against a possibly-curated taxonomy. Show the user any label whose existing color/description differs before overwriting it, never delete labels you didn't create, and on a repo with real issue history confirm before adding templates or creating milestones — their absence may be a choice.
 - Generate the project's **`area:*` labels** from its actual top-level structure (mapped to directories, not teams — e.g. `area:web`, `area:api`, `area:db`, `area:ci`, `area:infra`, `area:docs`), confirm the set with the user, create them, and record it under `areas:` in `.n8/config.yml`. Every issue filed by the workflow carries exactly one.
-- Write `.github/ISSUE_TEMPLATE/` templates for **epic**, **story**, and **bug** matching the body templates in `reference/github.md`, plus a `config.yml` with `blank_issues_enabled: false` — every issue arrives typed, whether filed by a human or an agent.
+- Write `.github/ISSUE_TEMPLATE/` **YAML issue forms** for **epic**, **story**, and **bug** — each auto-applying its label, with fields matching the body templates in `reference/github.md` — plus a `config.yml` with `blank_issues_enabled: false`, so every issue arrives typed. (The forms are for humans filing through the web UI; skills write the same sections directly with `--body-file`.)
 
 ## 5. Wiki
 
 - Check `gh repo view --json hasWikiEnabled,visibility`.
 - Wiki **disabled** (typical for private repos): tell the user plainly, with how to enable it (repo Settings → Features → Wikis). Ask whether they want to use wikis at all.
   - Opted out → record `wiki: opted-out` in config. Every n8SDLC skill respects this and skips wiki work without re-asking.
-- Wiki **enabled** and wanted: seed a hello-world wiki — clone `<repo>.wiki.git`, create a `Home.md` that honestly states the project is just initialized and the wiki will grow with it, push. (The wiki repo only exists after its first page; if cloning fails, create the first page via the web UI hint or `gh api` and tell the user.) Record `wiki: enabled`.
+- Wiki **enabled** and wanted: seed a hello-world wiki — clone `<repo>.wiki.git`, create a `Home.md` that honestly states the project is just initialized and the wiki will grow with it, push. **The wiki git repo only exists after its first page is created in the web UI, and there is no API for wiki pages** — until then, cloning/pushing `<repo>.wiki.git` fails with "Repository not found." If the clone fails, tell the user the one manual step (create any first page via the repo's Wiki tab), record `wiki: enabled`, and note that the next wiki-touching skill (or re-running init) will seed it properly.
 
 ## 6. Security features (public repos)
 
-Check visibility. For **public** repos, enable and verify:
+Check visibility. **Ordering: on a brand-new repo, run step 9's initial commit + push before this step's CodeQL and ruleset bullets** — CodeQL default setup no-ops on an empty repo, and a PR-required ruleset on `main` would block init's own direct push. For **public** repos, enable and verify:
 
 - Dependabot alerts + security updates: `gh api -X PUT repos/$R/vulnerability-alerts` and `gh api -X PUT repos/$R/automated-security-fixes`; write a stack-appropriate `.github/dependabot.yml`.
-- CodeQL default setup: `gh api -X PATCH repos/$R/code-scanning/default-setup -f state=configured` (fall back to committing a CodeQL workflow if default setup isn't available for the language).
-- Secret scanning + push protection: `gh api -X PATCH repos/$R -f 'security_and_analysis[secret_scanning][status]=enabled' -f 'security_and_analysis[secret_scanning_push_protection][status]=enabled'`.
-- Branch ruleset on `main`: require a PR and passing status checks before merge (fits the milestone-PR flow). Name the CI check requirement once CI exists; create the ruleset now with PR-required and note that the check requirement gets added by the CI milestone.
+- CodeQL default setup (after code is pushed): `gh api -X PATCH repos/$R/code-scanning/default-setup -f state=configured --silent` (fall back to committing a CodeQL workflow if default setup isn't available for the language).
+- Secret scanning + push protection: `gh api -X PATCH repos/$R --silent -f 'security_and_analysis[secret_scanning][status]=enabled' -f 'security_and_analysis[secret_scanning_push_protection][status]=enabled'`.
+- Branch ruleset on `main` (after the initial push): PR required before merge, approval count 0 for a solo author (anything higher deadlocks the milestone-PR flow). The check requirement gets added by the CI milestone once CI exists.
+  ```bash
+  cat > "$SCRATCH/ruleset.json" <<'JSON'
+  { "name": "main-pr-required", "target": "branch", "enforcement": "active",
+    "conditions": { "ref_name": { "include": ["~DEFAULT_BRANCH"], "exclude": [] } },
+    "rules": [ { "type": "pull_request", "parameters": {
+        "required_approving_review_count": 0, "dismiss_stale_reviews_on_push": false,
+        "require_code_owner_review": false, "require_last_push_approval": false,
+        "required_review_thread_resolution": false } } ] }
+  JSON
+  gh api -X POST repos/$R/rulesets --input "$SCRATCH/ruleset.json" --jq .id
+  ```
 - Private vulnerability reporting: `gh api -X PUT repos/$R/private-vulnerability-reporting`, plus a `SECURITY.md` that routes external reporters through private reporting, never a public issue ("a public reproduction is a working exploit handed to everyone"). State honest response expectations rather than promising SLAs the user can't keep — ask what they can commit to.
 - **Security-finding routing (the user decides):** ask how the project's *own* audit-found security findings get logged —
   - **`issues`** — public issues under the `security` label: a transparent register with full milestone/fingerprint/hierarchy integration. The right default for libraries and tools, where disclosure helps embedders assess risk.
