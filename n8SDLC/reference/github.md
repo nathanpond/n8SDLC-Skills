@@ -27,11 +27,8 @@ gh label create "<name>" --color <hex> --description "<desc>" --force
 | security | EE0701 | Security-related work or finding |
 | performance | F9D0C4 | Performance-related work or finding |
 | documentation | 0075CA | Documentation work |
-| duplicate | CFD3D7 | Duplicate of another issue |
 | help wanted | 008672 | Extra attention is needed |
-| invalid | E4E669 | Not a valid issue |
 | question | D876E3 | Further information is requested |
-| wontfix | FFFFFF | Will not be worked on |
 | needs-triage | EDEDED | Captured, not yet assessed |
 | sev:critical | B60205 | Finding: exploitable/destructive with severe impact |
 | sev:high | D93F0B | Finding: exploitable or badly wrong under realistic use |
@@ -39,6 +36,8 @@ gh label create "<name>" --color <hex> --description "<desc>" --force
 | sev:low | 0E8A16 | Finding: hardening / defense-in-depth |
 
 Severity (`sev:*`) labels go on **findings** — audit-filed issues and bugs — never on `feature` stories: a capability that doesn't exist yet cannot be a `sev:` of anything; what an absent feature costs is a product judgment, not a measurement of a failure. `needs-triage` marks quick-captured issues that haven't been assessed into the real vocabulary yet; it should be a transient state. Never invent a label — `gh label list` first, and if one seems missing, ask.
+
+There are deliberately **no** `duplicate`, `invalid`, or `wontfix` labels: those are *outcomes*, and GitHub close reasons carry them better (`gh issue close --reason "not planned"` with a comment saying why; duplicates get closed pointing at the surviving issue). A label can outlive its truth; a close reason travels with the closed state. Remember the Never: "not planned" is a human's call — the agent proposes such closes, the user approves.
 
 ## Issue hierarchy: epic → story → subtask
 

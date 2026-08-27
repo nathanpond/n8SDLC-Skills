@@ -26,7 +26,7 @@ Use context7 (when available) to confirm current APIs for any technology the upd
 
 - **Stale how** — subtask implementation details reference things that no longer exist. Rewrite the subtask.
 - **Stale what** — a story's AC assumes the old direction. Rewrite the AC (this changes the contract — call it out prominently).
-- **Invalidated** — the story no longer makes sense at all. Close with `wontfix` or `invalid` and an explanatory comment.
+- **Invalidated** — the story no longer makes sense at all. Close with `--reason "not planned"` and an explanatory comment (a "not planned" close is a human call — it happens only inside the user-approved change set).
 - **Missing** — the change implies work no story covers (e.g. Okta tenant provisioning). Draft new stories/subtasks (duplicate-check first).
 - **Re-wire** — dependency edges that changed with the above.
 

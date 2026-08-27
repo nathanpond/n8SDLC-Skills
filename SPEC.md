@@ -48,7 +48,9 @@ Decisions made 2026-08-27 while designing this skill suite. This is the record o
 - context7 MCP: strongly recommended, never required.
 
 ## Labels
-Spec set: epic, feature, security, performance, bug, documentation, duplicate, help wanted, invalid, question, wontfix, confirmed, subtask — **plus `blocked`** (exec's skip-and-continue), **`needs-triage`** (quick capture), and **`sev:critical/high/medium/low`** (findings only — `feature` never carries severity: an absent capability isn't a measurable failure).
+Trimmed middle path (decided 2026-08-27 after the label-philosophy discussion): epic, feature, security, performance, bug, documentation, help wanted, question, confirmed, subtask, `blocked` (exec's skip-and-continue), `needs-triage` (quick capture), and `sev:critical/high/medium/low` (findings only — `feature` never carries severity: an absent capability isn't a measurable failure).
+- **Dropped from the original spec list:** `duplicate`, `invalid`, `wontfix` — superseded by GitHub close reasons, which travel with the closed state; "not planned" closes remain a human-approved call.
+- Rejected: n8PDF's full closed-world taxonomy (kept `bug`/`question`/`help wanted` for community conventions and familiarity).
 - `confirmed` = bug reproduced.
 
 ## Naming
