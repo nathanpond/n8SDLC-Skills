@@ -25,13 +25,13 @@ Read `${CLAUDE_PLUGIN_ROOT}/reference/github.md` and `${CLAUDE_PLUGIN_ROOT}/refe
 
 ## 3. Confirm, then release
 
-Show the user what's about to happen — version, target SHA, the milestones/PRs included, and **what the tag triggers** per the CI design (production deploy? package publish? nothing?) — and get an explicit go. Then:
+Show the user what's about to happen — version, target SHA, the milestones/PRs included, and **what the tag triggers** per the CI design (production deploy? package publish? nothing?) — and get an explicit go. Then check **who creates the release object**: read the tag-triggered workflow first. If it runs `gh release create` itself, your job is to push the tag and verify the workflow's release — running `gh release create` too would collide. Only when no workflow creates it do you run:
 
 ```bash
 gh release create v<X.Y.Z> --title v<X.Y.Z> --generate-notes
 ```
 
-Notes generate from merged PR titles (which carry their issue numbers — that's why). Add a short human-written summary above the generated notes when the release is user-facing: what this version *means*, in the same honest voice as the wiki. If CI attaches artifacts on tag, let it; verify they appear.
+Notes generate from merged PR titles (which carry their issue numbers — that's why). Either way, add a short human-written summary above the generated notes (`gh release edit`) when the release is user-facing: what this version *means*, in the same honest voice as the wiki. If CI attaches artifacts on tag, let it; verify they appear.
 
 ## 4. Watch what the tag set in motion
 
