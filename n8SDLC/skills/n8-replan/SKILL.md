@@ -34,7 +34,7 @@ Use context7 (when available) to confirm current APIs for any technology the upd
 
 Present one change summary before touching anything: per issue — what changes and *which ad-hoc change caused it*; new issues in full; closures with reasons; a note where epic-level AC on the roadmap itself is affected (flag it — epic AC changes deserve the user's explicit eyes). Then, on approval, apply everything: edit bodies, close, create, attach sub-issues, re-wire dependencies, update milestone descriptions.
 
-Leave an audit trail: comment on every modified issue ("Replanned 2026-08-27: auth moved Google → Okta, AC updated accordingly"), and log the replan (cause, issues touched) to `.n8/decisions.md`. Mark the triggering ad-hoc ledger entries as reconciled (append `— reconciled by /n8-replan <date>`) so future drift checks don't re-flag them.
+Leave an audit trail: comment on every modified issue ("Replanned 2026-08-27: auth moved Google → Okta, AC updated accordingly"), and log the replan (cause, issues touched) to `.n8/decisions.md`, landing the state edits per `reference/state.md`'s "Committing state changes". Mark the triggering ad-hoc ledger entries as reconciled (append `— reconciled by /n8-replan <date>`) so future drift checks don't re-flag them.
 
 ## 5. Report
 

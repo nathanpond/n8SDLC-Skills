@@ -31,7 +31,7 @@ Respect the role split: **the user is the founder, you are the builder.** Ask th
 
 Themes that recur:
 
-- Concrete technology and library choices (verify current APIs/versions via context7 when available — plans built on stale docs produce broken code).
+- Concrete technology and library choices (verify current APIs/versions via context7 when available — skip when config says `context7: declined` — plans built on stale docs produce broken code).
 - Data models, API shapes, naming — anything with more than one defensible answer.
 - UX decisions: flows, validation behavior, error states, empty states.
 - Edge cases and failure handling: what should happen when X fails?
@@ -71,7 +71,9 @@ Step back and analyze the full plan for what the roadmap couldn't see:
 
 Log notable planning decisions to `.n8/decisions.md`.
 
-## 5. Report
+## 5. Commit and report
+
+Land any local state edits (`.n8/decisions.md`, CLAUDE.md invariant markings) per `reference/state.md`'s "Committing state changes" — the main ruleset blocks direct pushes.
 
 Per milestone: story count, subtask count, dependency chains, test coverage summary. Then the analysis outcomes (audit emphases, suggested skills). Finish with the next step — more planning if milestones remain unplanned, otherwise:
 
