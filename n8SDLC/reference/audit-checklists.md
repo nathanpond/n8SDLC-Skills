@@ -77,6 +77,16 @@ Frame it as catching **escapes from the framework's baseline**: a good component
 - Every finding cites its **WCAG success criterion** (e.g. "WCAG 1.1.1 / 508 §501"). Default to WCAG 2.0 AA (the 508 floor) and note where 2.1/2.2 criteria are cheap to adopt.
 - Out of scope, say so explicitly: VPAT/procurement docs (a compliance artifact derived from the audit, not the audit), and non-HTML deliverables.
 
+## Integration (wiring audit)
+
+**Existence ≠ integration.** Individual stories can each pass while the system fails: a component exists but nothing imports it, an API exists but nothing calls it, a form renders but has no handler, data is written but never displayed. This is *the* failure mode of autonomous milestone execution — check connections, not existence.
+
+- Build a provides/consumes map for the milestone's (or project's) exported surface, then classify each export: **CONNECTED** (imported elsewhere and referenced beyond the import line) / **IMPORTED_NOT_USED** / **ORPHANED** (zero imports).
+- Enumerate API routes/endpoints from the filesystem and confirm each has at least one caller; enumerate UI entry points and confirm each reaches its backend.
+- Chase the four link classes: exports → imports, APIs → consumers, forms → handlers, data writes → reads/display.
+- Severity by class: an orphaned load-bearing artifact (a truth depends on it) is high; an unused convenience export is cleanup.
+- Cross-reference the must-haves `key_links` from closed stories — every planned link should now be CONNECTED.
+
 ## Tests (coverage audit)
 
 - Inventory what's covered vs. the app's actual high-value user journeys; identify missing coverage by priority, with the exact journey enumerated per gap.

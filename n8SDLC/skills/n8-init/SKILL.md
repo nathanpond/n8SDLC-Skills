@@ -19,7 +19,7 @@ Read `${CLAUDE_PLUGIN_ROOT}/reference/github.md` (labels, templates, conventions
 
 Inspect the folder for an existing project using the detection markers in `${CLAUDE_PLUGIN_ROOT}/reference/stacks/*.md` (.NET, TypeScript, Python, Unity, Flutter).
 
-- **Found:** confirm the detected stack with the user and record it.
+- **Found:** confirm the detected stack with the user and record it. If it's a substantial existing codebase (not a fresh scaffold), recommend running `/n8-map` before `/n8-roadmap` so planning happens against a real map of what's there.
 - **Not found:** ask what should be created — offer the five first-class stacks plus "something else". For a first-class stack, follow its reference file's Scaffold section. For anything else, ask enough questions (language, project shape, test framework) to scaffold sensibly with that ecosystem's standard generator.
 
 Either way, wire the stack's **analyzers/linters into the build** from day one (the stack file's Tests/quality section names them) — build-time analysis is the always-on layer the audits lean on. Where rules get tuned down, the suppression config carries a one-line rationale per rule; audits treat unexplained suppressions as findings.

@@ -18,14 +18,24 @@ Read `${CLAUDE_PLUGIN_ROOT}/reference/github.md` and `${CLAUDE_PLUGIN_ROOT}/refe
 
 ## 2. Verify (per milestone)
 
-Work story by story against acceptance criteria — the AC checkboxes are the contract:
+Work story by story against acceptance criteria — the AC checkboxes are the contract. **Do not trust closing comments or summaries: they document what the executor *said* it did. You verify what actually exists.**
 
+- **Cash the must-haves block first.** For each artifact it names, check three levels: *exists* → *substantive* (real implementation, not a stub — grep for `TODO|FIXME|placeholder|not implemented`, empty returns, missing exports) → *wired* (imported somewhere else AND referenced beyond the import line). Classify each: exists+substantive+wired = **VERIFIED**; unwired = **ORPHANED**; not substantive = **STUB**; absent = **MISSING**. Post the truth table in the verification record; anything below VERIFIED fails its truth.
 - Run the full automated test suite; confirm the tests each story's test plan promised actually exist and pass. A green suite with missing promised tests is a failure.
 - **A changed snapshot/golden is a claim, not a result.** If any snapshot, golden file, or recorded baseline was updated during execution, review the diff and confirm the new output is *correct* — a golden regenerated to make a test pass proves nothing. The verification record must say why the new output is right.
-- **--auto:** exercise each AC directly where possible — run the app, hit the endpoints, drive the UI, inspect outputs. Prefer evidence over inspection: "I called it and observed X" beats "the code looks right".
-- **--testplan:** write numbered manual steps per story (setup, action, expected result) and present them.
+- **--auto:** exercise each AC directly where possible — run the app, hit the endpoints, drive the UI, inspect outputs. Prefer evidence over inspection: "I called it and observed X" beats "the code looks right". Where a story has no `Demo` (agent-verifiable by design), derive the checks from its AC and must-have truths.
+- **--testplan:** produce manual test scenarios and run the UAT protocol below.
 
-**Steps the agent can't verify** (real devices, third-party dashboards, payments, emails, deployment targets you can't reach): even under `--auto`, don't pretend. Present these as manual verification steps and ask the user to run them and approve. Milestone closure waits for that approval.
+**Steps the agent can't verify** (real devices, third-party dashboards, payments, emails, deployment targets you can't reach): even under `--auto`, don't pretend — run the UAT protocol below on those steps. Milestone closure waits for the user's results.
+
+## The UAT protocol (manual steps and --testplan)
+
+The user performs UAT — **you prepare the environment and give instructions; you must not run the demo yourself and report the results back** (that's automated verification wearing a costume). Start whatever needs starting *before* handing over — dev server up, seed data in, URL ready.
+
+- Build scenarios from each story's `Demo` script where one exists; derive from AC otherwise. Order them **by user journey, not by story or component**.
+- One test at a time, plain conversational text: here's what should happen — does it? "yes"/"next" passes. Anything else is logged as a failure with **severity inferred from the user's own words** (crash/broken/fails → blocker; doesn't work/wrong/missing → major; slow/weird/minor → minor; spacing/color → cosmetic) — never ask them to rate severity.
+- **Never fix during testing.** Log everything, finish the pass, then diagnose — mid-UAT fixes invalidate the session and lose findings.
+- Internal changes get summarized verification ("all 47 tests pass") — the user checks what they'd encounter in normal use, not your source code.
 
 ## 3. Failures → bugs, offer re-exec
 

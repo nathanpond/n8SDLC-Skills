@@ -23,7 +23,13 @@ First, sweep `needs-triage` issues (quick captures from `/n8-file` and discovere
 
 When planning M0 or the CI milestone, check the project invariants in CLAUDE.md: every invariant marked test-enforced needs a story creating its **executable guard** (a test or build setting that fails when the invariant is breached — package-count test, public-API snapshot, warnings-as-errors). If a guard story is missing, add it and update the invariant's marking once it lands.
 
-For each milestone, study its epics and phases, then ask everything execution would otherwise have to guess. Themes that recur:
+For each milestone, study its epics and phases, then ask everything execution would otherwise have to guess. **Derive question areas from the shape of what's being built, never generic categories**: something users SEE → states, interactions, visual behavior; something users CALL → contracts, responses, errors; something users RUN → invocation, flags, output; something being ORGANIZED → criteria, grouping, exceptions. ("User authentication" → session handling, error responses, multi-device policy, recovery flow — not "UI/UX/Behavior".)
+
+Respect the role split: **the user is the founder, you are the builder.** Ask them how it should work, look, and feel, and what's essential vs. nice-to-have. Never ask them about codebase patterns, technical risks, or implementation approach — read the code and docs for those. Two capture rules while questioning:
+- **Scope creep deflects losslessly:** an answer that adds a new capability ("does this clarify what's in scope, or add something that could be its own story?") gets captured via `/n8-file`-style issues, not folded in silently or dropped.
+- **Delegation gets recorded:** every "you decide" answer lands in the story's **Claude's Discretion** section — an explicit map of where autonomous execution may improvise without raising a blocker.
+
+Themes that recur:
 
 - Concrete technology and library choices (verify current APIs/versions via context7 when available — plans built on stale docs produce broken code).
 - Data models, API shapes, naming — anything with more than one defensible answer.
@@ -34,6 +40,15 @@ For each milestone, study its epics and phases, then ask everything execution wo
 Batch questions sensibly rather than dribbling them one at a time. Skip questions whose answers are already in `.n8/config.yml`, existing issues, or the codebase.
 
 ## 3. Create stories and subtasks
+
+Every story body carries the full template from `reference/github.md`, including two blocks that make verification structural rather than trust-based:
+- **Must-haves, derived goal-backward:** state the user-observable truths first, then the artifacts that realize them, then the key links where stubs hide. "Task completion ≠ goal achievement" — a "create chat component" task can complete while the component is a placeholder; the truths are what verify actually checks.
+- **Demo** — a concrete ~60-second user script — for stories a human will verify (user-facing flows, anything with manual verification steps). Stories the agent can fully verify on its own may omit it; `/n8-verify --auto` derives its checks from the AC and must-haves instead.
+
+**Self-check before filing** (run it on the whole batch, fix before presenting):
+- Every key link has an *owning task* — wiring mentioned nowhere is wiring that won't exist ("Chat.tsx created but nothing wires it to /api/chat" is the classic miss).
+- Every truth is user-observable — "JWT library installed" is not a truth; "user can log in" is.
+- Scope backstop: a story needing more than ~8 files or that can't be described in three or four checkable criteria is two stories.
 
 **Present the breakdown before creating anything.** Show a compact review artifact — one line per issue: `title — labels — one-line outcome`, marking which are epics/spikes and what depends on what. Enough to judge the slicing without reading full bodies. On the user's go, create the batch and report the numbers with links. Never create issues speculatively mid-discussion, and never skip the gate because the plan seems obvious.
 

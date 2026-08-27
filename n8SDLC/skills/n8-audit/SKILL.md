@@ -1,7 +1,7 @@
 ---
 name: n8-audit
-description: Run project audits in the n8SDLC workflow — security, stability, performance, cleanup, authorization, 508 accessibility, and test coverage. "/n8-audit security" runs one area, "/n8-audit" offers the suite. Uses stack-appropriate tooling (CodeQL, semgrep, dependency audits, fuzzing where applicable), verified findings with a shared severity rubric, fingerprinted idempotent re-runs, then asks which findings to file as GitHub issues. Use whenever the user says "n8-audit", "audit the project", "security review", "accessibility check", or during the final Audit milestone.
-argument-hint: "[security | stability | performance | cleanup | authorization | 508 | tests | all]"
+description: Run project audits in the n8SDLC workflow — security, stability, performance, cleanup, authorization, 508 accessibility, test coverage, and integration wiring. "/n8-audit security" runs one area, "/n8-audit" offers the suite. Uses stack-appropriate tooling (CodeQL, semgrep, dependency audits, fuzzing where applicable), verified findings with a shared severity rubric, fingerprinted idempotent re-runs, then asks which findings to file as GitHub issues. Use whenever the user says "n8-audit", "audit the project", "security review", "accessibility check", or during the final Audit milestone.
+argument-hint: "[security | stability | performance | cleanup | authorization | 508 | tests | integration | all]"
 ---
 
 # /n8-audit — Project Audits
@@ -14,7 +14,7 @@ Scope is **codebase-wide**, not the pending diff — run on demand, typically be
 
 ## Areas
 
-**security · authorization · stability · performance · cleanup · 508 · tests** — each has a concern checklist in `reference/audit-checklists.md`. Also audit **project invariants** (declared in the project's CLAUDE.md n8SDLC section, if any) as part of every run: for test-enforced invariants, verify the guard test still exists, still runs, and hasn't been weakened or skipped; honor-system invariants get checked by hand. Suppressed warnings, disabled rules without rationale, and invariant drift are findings regardless of dimension.
+**security · authorization · stability · performance · cleanup · 508 · tests · integration** — each has a concern checklist in `reference/audit-checklists.md`. Also audit **project invariants** (declared in the project's CLAUDE.md n8SDLC section, if any) as part of every run: for test-enforced invariants, verify the guard test still exists, still runs, and hasn't been weakened or skipped; honor-system invariants get checked by hand. Suppressed warnings, disabled rules without rationale, and invariant drift are findings regardless of dimension.
 
 ## The contract (what makes audits comparable)
 

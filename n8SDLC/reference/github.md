@@ -159,12 +159,32 @@ Hard-won rules — each exists because the naive behavior failed in practice:
 ## Acceptance criteria
 - [ ] <testable criterion>
 
+## Must-haves
+truths:            # 3-7 user-observable statements this story makes true
+  - "User can see existing messages"
+artifacts:         # concrete files that make each truth possible
+  - path: "src/components/Chat.tsx"
+    provides: "Message list rendering"
+key_links:         # the connections where stubs hide
+  - from: "Chat.tsx"
+    to: "/api/chat"
+    via: "fetch in useEffect"
+
+## Demo
+<user-facing stories only: a concrete ~60-second user script — specific actions, observable
+outcomes, complete workflow. Omit for stories the agent can fully verify on its own.>
+
 ## Test plan
 <automated tests to be written as part of this story; they must pass before the story is done>
+
+## Claude's Discretion
+<decisions the user explicitly delegated during planning — where execution may improvise without a blocker>
 
 ## Dependencies
 <Blocked by: #N lines, if the native API is unavailable>
 ```
+
+The **Must-haves** block is derived goal-backward at plan time and cashed by `/n8-verify`: truths must be *user-observable outcomes* ("user can log in", never "JWT library installed"), artifacts are the files that realize them, key links are the wiring where stubs hide. A good **Demo** is executable in ~60 seconds with no code inspection — "curl returns 200" is inspection, not a demo, and "all tests pass" is a gate, not a demo.
 
 **Subtask:**
 ```markdown
