@@ -12,7 +12,7 @@ Read `${CLAUDE_PLUGIN_ROOT}/reference/github.md` conventions if not already load
 
 1. **Duplicate check:** `gh issue list --state all --search "<key terms>" --json number,title,state`. If one exists, comment on it rather than filing, and say which.
 2. **Anchor it:** locate the relevant code so the issue has a real anchor — `path:lines` and the area/subsystem it sits in. A minute, not ten.
-3. **File:** `gh issue create --title "<area>: <specific problem>" --body-file <tmpfile> --label needs-triage`. Body: what, where, why it matters, how it was noticed. Add `security` and a `sev:*` label only when the problem is clearly a reachable security finding.
+3. **File:** `gh issue create --title "<area>: <specific problem>" --body-file <tmpfile> --label needs-triage` — plus the `area:*` label when the anchor makes it obvious (it usually does: the anchor names the file). Only skip the area label when genuinely unclear; triage adds it later. Body: what, where, why it matters, how it was noticed. Add `security` and a `sev:*` label only when the problem is clearly a reachable security finding.
 4. **Reply with the issue number and URL. One line.** Then return to whatever was in progress.
 
 Captured issues carry no milestone — the next `/n8-plan` (or `/n8-replan`) pass triages `needs-triage` issues into the plan, or the user promotes them directly.

@@ -22,7 +22,7 @@ A reader should be able to trust every sentence. When in doubt between flatterin
 
 ## The pass
 
-1. Clone the wiki: `git clone $(gh repo view --json url --jq .url).wiki.git` into the scratchpad.
+1. Clone the wiki: `git clone $(gh repo view --json url --jq .url).wiki.git` into the scratchpad. A `repository not found` failure means the wiki is **uninitialized** — it exists only after a first page is saved in the web UI (no API can do it). Per `reference/state.md`: skip the wiki work, remind the user of the one manual step, and stop gracefully — check `.n8/decisions.md` first, since `/n8-init` logs this exact pending action when it hits the same wall.
 2. Build the ground truth: open issues/milestones (what's planned vs done), closed milestones (what shipped), the codebase (what actually exists — spot-check claims against code, don't trust page prose), `.n8/decisions.md` (decisions worth documenting).
 3. Reconcile every page: fix stale claims, dead references, described-but-removed features, wrong setup instructions (verify commands against the repo's actual scripts/config).
 4. Add missing pages where a reader would need them — typically: Home (project state overview), Getting Started / local dev setup, Architecture (as-built, including notable decisions and their whys), and per-area pages as the app grows. Don't create pages for the sake of structure; an empty-ish wiki that's accurate beats a full one that isn't.

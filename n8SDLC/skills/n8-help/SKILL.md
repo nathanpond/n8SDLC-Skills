@@ -5,7 +5,7 @@ description: Show the n8SDLC command reference — every /n8-* command with a on
 
 # /n8-help — Command Reference
 
-Print the reference below (as a markdown table or tight list — whichever renders better in context), adjusted honestly for the current project: if `.n8/config.yml` doesn't exist yet, lead with "this project isn't initialized — start with `/n8-init`."
+Print the reference below (as a markdown table or tight list — whichever renders better in context), adjusted honestly for the current project: if `.n8/config.yml` doesn't exist yet, lead with "this project isn't initialized — start with `/n8-init`." On an initialized project, annotate each command with its current relevance (done / next / not applicable) from a quick state read — the same signals `/n8-stat` uses, kept at table altitude; don't run a full stat derivation just to print help.
 
 Open and close with the one thing the user should remember:
 

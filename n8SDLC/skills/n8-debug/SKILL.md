@@ -38,4 +38,6 @@ Write-discipline per section — **update the issue BEFORE acting, not after**: 
 
 ## Closing
 
-Fix with a **regression test that reproduces the bug**, then close through the normal working discipline (evidence in the closing comment: mechanism, fix, test). The Eliminated trail stays in the issue — it's the documentation of why the fix is the right one.
+An investigation may conclude **works-as-designed** — that's a success, not a failure to find. Close the investigation issue with `--reason "not planned"` and the mechanism + evidence in the closing comment; closing your *own* user-requested investigation this way is the investigator's call and exempt from the "'not planned' is a human's call" Never (which protects other people's issues from unilateral triage).
+
+Otherwise, fix with a **regression test that reproduces the bug**, then close through the normal working discipline (evidence in the closing comment: mechanism, fix, test). The Eliminated trail stays in the issue — it's the documentation of why the fix is the right one.
