@@ -1,0 +1,52 @@
+# Local State Conventions (.n8/)
+
+GitHub Issues/milestones are the source of truth for all planning. The tracked `.n8/` directory holds only what doesn't fit GitHub: configuration answers, the decision log, and free-form memories. Never duplicate issue content into `.n8/` — two sources of truth drift.
+
+```
+.n8/
+├── config.yml       # project configuration and one-time answers
+├── decisions.md     # append-only decision log
+└── memory/          # free-form .md memories, one topic per file
+```
+
+## config.yml
+
+Created by `/n8-init`, extended by `/n8-roadmap`. Example shape (add keys as needed, keep flat and readable):
+
+```yaml
+version: 1
+stack: dotnet            # dotnet | typescript | python | unity | flutter | <other>
+initialized: 2026-08-27
+wiki: enabled            # enabled | opted-out | unavailable
+repo: nathanpond/example
+visibility: public
+deployment:
+  dev: <answer from roadmap Q&A>
+  stage: <answer>
+  production: <answer>
+  notes: <how the app is deployed, hosting decisions>
+ci: github-actions       # or whatever the user chose
+context7: installed      # installed | declined
+```
+
+Skills read `wiki:` before touching wikis. `opted-out` means the user said no — skip all wiki work silently, don't re-ask.
+
+## decisions.md
+
+Append-only log of every decision made during planning and (especially) execution. During autonomous execution the user isn't watching — this log is how they audit what happened. Record real decisions (choices between alternatives, assumptions made, deviations from plan), not routine actions.
+
+Format — one `##` section per skill run, entries appended chronologically:
+
+```markdown
+## /n8-exec M1 — 2026-08-27
+
+- **Decision:** Used SQLite for local dev database instead of running Postgres in Docker.
+  **Why:** Plan specified "local relational DB" without naming one; SQLite needs no daemon and the ORM abstracts the difference. Low cost if wrong.
+  **Issue:** #14
+```
+
+After execution completes, the exec skill displays all decisions from its run to the user.
+
+## memory/
+
+Free-form markdown memories — anything worth remembering across sessions that isn't planning state: quirks of the deployment target, user preferences discovered mid-project, external service credentials *locations* (never the credentials themselves), lessons learned. One topic per file, short kebab-case names. Check for an existing file on the topic before creating a new one.

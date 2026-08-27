@@ -1,0 +1,49 @@
+# n8SDLC — Design Decisions
+
+Decisions made 2026-08-27 while designing this skill suite. This is the record of *why* the skills work the way they do; change a decision here when changing the corresponding behavior.
+
+## Packaging
+- **Claude Code plugin** (`n8SDLC/` is the plugin; this repo is also its marketplace). Install once, `/n8-*` available in every project, updates propagate.
+
+## Planning model
+- **GitHub is the source of truth.** Epic → story → subtask via **native sub-issues**; native `blocked_by` dependencies. Body-text fallbacks (`Parent: #N`, `Blocked by: #N`) when the APIs are unavailable.
+- Stories describe the **what** (AC + test plan); subtasks the **how** (only when prescribing is warranted).
+- `.n8/` (tracked) holds only what doesn't fit GitHub: `config.yml` (stack, wiki choice, deployment/CI answers, context7), `decisions.md` (append-only), `memory/`.
+- Milestones: `M0: Infrastructure` always first; CI early (usually M1); `M<N>: Audit` always last. Phases + definition of done live in the milestone description.
+- Duplicate check before every issue; related-but-different → ask (extend AC vs new issue).
+
+## Execution
+- **Branch + PR per milestone**; commit per story; PR body `Closes #N` per story; merge gated on CI when it exists.
+- Preconditions are hard stops: unplanned milestone, or earlier milestone unexecuted.
+- Blockers (legitimately unsure + high cost of wrong): **skip, mark `blocked`, continue** with non-dependent work; surface all at the end. Low-cost calls are made and logged, not asked.
+- All decisions logged to `.n8/decisions.md` and displayed after execution.
+
+## Verification
+- Milestone args + wildcard, like exec; no args = executed-but-unverified.
+- `--auto` (default) verifies all the agent can; `--testplan` yields manual steps. Un-verifiable items always become manual steps needing user approval.
+- Failures → `bug` issues in the same milestone (`confirmed` = reproduced), offer immediate re-exec.
+- **Verify closes milestones** — exec never does. Verification is part of done.
+
+## Audits
+- Areas: security, stability, performance, cleanup, authorization, 508.
+- **Report first, then ask which findings to file** (into the Audit milestone by default).
+- Tooling: GitHub-native (Dependabot, CodeQL, secret scanning + push protection, branch rulesets) + semgrep, fuzzing where applicable, and app-appropriate OSS tools.
+- `/n8-plan`'s whole-project analysis records per-app audit emphases in the Audit milestone.
+
+## Wiki
+- Optional; opt-out recorded in config and respected everywhere.
+- Reconcile pass **applies directly, then summarizes**.
+- Voice: human, informational, honest by default — never oversell.
+
+## Init
+- User supplies the GitHub remote (init does not create repos).
+- First-class stacks: .NET/C#, TypeScript/Node, Python, Unity, Dart/Flutter; generic path for others.
+- Security features on public repos: Dependabot, CodeQL, secret scanning + push protection, branch rulesets. Private repos: honest note about what's unavailable.
+- context7 MCP: strongly recommended, never required.
+
+## Labels
+Spec set: epic, feature, security, performance, bug, documentation, duplicate, help wanted, invalid, question, wontfix, confirmed, subtask — **plus `blocked`** (added to support exec's skip-and-continue behavior).
+- `confirmed` = bug reproduced.
+
+## Naming
+- Everything under `/n8-` including `/n8-audit` (spec's `/audit` renamed for namespace consistency).
