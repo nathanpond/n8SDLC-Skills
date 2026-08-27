@@ -2,6 +2,8 @@
 
 Shared conventions for every n8SDLC skill. All GitHub operations go through the `gh` CLI. Assume it is installed and authenticated; if `gh auth status` fails, stop and tell the user how to fix it (`gh auth login`) — do not attempt workarounds.
 
+`gh` **2.94.0 or newer** is needed for the native `--parent` and `--add-blocked-by` flags (`gh --version`; warn but don't block — labels and plain issues work on older versions, hierarchy falls back to body conventions). Probe capabilities rather than assuming them: e.g. issue *types* (`--type Bug|Feature`) are org-only — `gh api "orgs/<owner>/issue-types"` succeeds only for organizations, so the skills never use `--type`; labels carry that information instead.
+
 GitHub is the source of truth for all planning state. Before creating anything (label, milestone, issue), check whether it already exists — every operation in this workflow must be safe to re-run.
 
 Set `R=$(gh repo view --json nameWithOwner --jq .nameWithOwner)` once and reuse it.
@@ -30,6 +32,13 @@ gh label create "<name>" --color <hex> --description "<desc>" --force
 | invalid | E4E669 | Not a valid issue |
 | question | D876E3 | Further information is requested |
 | wontfix | FFFFFF | Will not be worked on |
+| needs-triage | EDEDED | Captured, not yet assessed |
+| sev:critical | B60205 | Finding: exploitable/destructive with severe impact |
+| sev:high | D93F0B | Finding: exploitable or badly wrong under realistic use |
+| sev:medium | FBCA04 | Finding: wrong where a clean failure or correct result was owed |
+| sev:low | 0E8A16 | Finding: hardening / defense-in-depth |
+
+Severity (`sev:*`) labels go on **findings** — audit-filed issues and bugs — never on `feature` stories: a capability that doesn't exist yet cannot be a `sev:` of anything; what an absent feature costs is a product judgment, not a measurement of a failure. `needs-triage` marks quick-captured issues that haven't been assessed into the real vocabulary yet; it should be a transient state. Never invent a label — `gh label list` first, and if one seems missing, ask.
 
 ## Issue hierarchy: epic → story → subtask
 
@@ -39,26 +48,31 @@ Use GitHub **native sub-issues** so progress rolls up in the UI:
 - **Story** (`feature`, `bug`, `security`, `performance`, or `documentation` label): describes the *what* with testable acceptance criteria and a test plan. Subtasks are its sub-issues.
 - **Subtask** (`subtask` label): describes the *how* — specific implementation instructions. Only create subtasks when the implementation approach genuinely needs prescribing; a story with obvious implementation needs none.
 
-Sub-issue API (needs the child's internal id, not its number):
+Epics may nest (an epic can be a sub-issue of a broader epic) — `epic` is a role, not a tier.
+
+Use the native CLI flags (gh ≥ 2.94.0) — they're the proven path:
 
 ```bash
-CHILD_ID=$(gh api repos/$R/issues/$CHILD_NUM --jq .id)
-gh api -X POST repos/$R/issues/$PARENT_NUM/sub_issues -F sub_issue_id=$CHILD_ID
-gh api repos/$R/issues/$PARENT_NUM/sub_issues          # list children
+gh issue create --title "..." --body-file /tmp/body.md --label feature --parent $EPIC_NUM
+gh issue edit $CHILD_NUM --add-parent $EPIC_NUM        # attach after the fact
+gh api repos/$R/issues/$PARENT_NUM/sub_issues          # read children
 ```
 
-**Fallback:** if the sub-issue endpoints are unavailable (older GHES, API changes), degrade gracefully: add a `- [ ] #<child>` task-list line to the parent body and a `Parent: #<parent>` line at the top of the child body. All skills must treat those body conventions as equivalent to native sub-issues when reading hierarchy.
+Always `--body-file <tmpfile>`, not `--body` — issue bodies here are multi-section markdown with fenced code, and inline quoting mangles them.
+
+**Fallback:** if sub-issue support is unavailable (old gh/GHES), degrade gracefully: add a `- [ ] #<child>` task-list line to the parent body and a `Parent: #<parent>` line at the top of the child body. All skills must treat those body conventions as equivalent to native sub-issues when reading hierarchy.
 
 ## Dependencies (blocked by / blocks)
 
-Prefer GitHub's native issue dependencies:
-
 ```bash
-BLOCKER_ID=$(gh api repos/$R/issues/$BLOCKER_NUM --jq .id)
-gh api -X POST repos/$R/issues/$NUM/dependencies/blocked_by -F issue_id=$BLOCKER_ID
+gh issue create ... --add-blocked-by $BLOCKER_NUM      # at creation
+gh issue edit $NUM --add-blocked-by $BLOCKER_NUM       # after the fact
+gh api repos/$R/issues/$NUM/dependencies/blocked_by    # read
 ```
 
-**Fallback:** if the endpoint is unavailable, record `Blocked by: #N` / `Blocks: #N` lines in a `## Dependencies` section of the issue body. Skills reading dependency order must check both the API and these body lines.
+Encode ordering with dependencies, **not prose** — execution follows the graph. Prose in the body may *explain* a dependency (e.g. "both rewrite the same function; #7's catch has to wrap #2's restructured loop"), but the machine-readable edge carries it.
+
+**Fallback:** if unavailable, record `Blocked by: #N` / `Blocks: #N` lines in a `## Dependencies` section of the issue body. Skills reading dependency order must check both the API and these body lines.
 
 ## Milestones
 
@@ -76,9 +90,44 @@ gh api -X POST repos/$R/milestones -f title="M1: Core API" -f description="..."
 
 ## Duplicate check — before creating ANY issue
 
-1. Search: `gh issue list --state all --search "<keywords>"` (try a couple of keyword variants).
+1. Search: `gh issue list --state all --search "<keywords>" --json number,title,state` (try a couple of keyword variants).
 2. Exact or near-exact match → do not create. Report the existing issue.
 3. Related but not the same → ask the user: extend the existing issue's acceptance criteria to cover this, or create a new issue linked to it? Never silently pick one.
+
+One finding/problem per issue — never batch. And file only what you can substantiate: a finding needs a concrete failure you can state — an input or situation that reaches it and what happens. "This could break" without a path to it is noise, and noise filed as issues is worse than a missed low-severity item.
+
+## Fingerprints — idempotent re-runs (audits, detectors)
+
+Any issue filed by a repeatable process (audit passes especially) ends its body with a stable fingerprint:
+
+```html
+<!-- fingerprint: <rule-id>|<relative/path>|<symbol-or-area> -->
+```
+
+`rule-id` is free-form kebab-case, reused across findings of the same shape (`missing-cache`, `unbounded-alloc`, `quadratic`) — a de facto rule taxonomy. On a repeat run, bulk-load prior state in one call:
+
+```bash
+gh issue list --state all --label <audit-area> --limit 300 --json number,title,state,body
+```
+
+then three-way dedupe each new candidate by fingerprint:
+- Matching **open** issue → comment the new evidence; do not file again.
+- Matching **closed** issue → `gh issue reopen` with a comment that it **regressed**.
+- No match → file.
+
+This is what makes a repeated audit produce deltas instead of duplicates.
+
+## Working discipline (execution)
+
+Hard-won rules — each exists because the naive behavior failed in practice:
+
+- **Comment the plan before the code.** Before implementing an issue, comment 2–5 bullets on it: the approach and files you expect to touch. If the issue lacks acceptance criteria, derive them and put them in this comment as a checklist — the definition of done gets written down before the work starts.
+- **`Refs #N` in commits, never `Fixes #N`/`Closes #N`.** Auto-closing keywords only fire on the default branch; on a feature/milestone branch they silently do nothing, so they train false confidence. Closing is done deliberately (PR body, or an explicit close with evidence).
+- **Check issue state after every merge.** GitHub closes issues linked to a branch/PR on merge regardless of keywords. After merging, `gh issue view <n> --json state` for anything only partially done; if it was auto-closed: `gh issue reopen <n> --comment "Reopened: closed by the merge, not by completion. <what is left>"`. An issue wrongly marked done is worse than one left open.
+- **Push before closing.** Issue state syncs across machines instantly; unpushed code does not. A closed issue with no code on the remote is a lie told to the other computer.
+- **Close with evidence.** A closing comment carries: branch @ short SHA (or merge PR), what changed per acceptance criterion (check the boxes), exact test results (`4822 passed / 0 failed`, and which optional checkers/env flags were on), and CI status. `gh issue close <n> --reason completed --comment "..."`.
+- **Discovered work is filed, not fixed.** A separate problem found mid-issue gets its own issue: `--label needs-triage`, body starting "Discovered while working #N.", then a cross-reference comment on #N. Fixing it inline is silent scope creep.
+- **The four Nevers:** never close an issue you did not personally verify as done; never close issues as bulk cleanup unless asked; never touch issues you did not create unless directed to that number; never use `--reason "not planned"` on your own initiative — that is a human's triage call.
 
 ## Issue body templates
 
@@ -121,5 +170,5 @@ gh api -X POST repos/$R/milestones -f title="M1: Core API" -f description="..."
 ## Branch and PR conventions
 
 - One branch per milestone: `milestone/m1-short-name`.
-- Commit per story on that branch; reference the story number in the commit subject (`feat: user login (#12)`).
-- One PR per milestone. The PR body lists `Closes #N` for every completed story so the merge closes them all. Merge only when CI is green (once CI exists).
+- Commit per story on that branch; reference the story in the commit body as `Refs #N` (and optionally the subject: `feat: user login (#12)`). Never closing keywords in commits — see Working discipline.
+- One PR per milestone. The PR body lists `Closes #N` for every **completed** story (the PR merges to the default branch, so these fire correctly) — never for partially done stories. Merge only when CI is green (once CI exists), then run the post-merge state check on every story that was touched but not finished.

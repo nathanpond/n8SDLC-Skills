@@ -48,8 +48,21 @@ Decisions made 2026-08-27 while designing this skill suite. This is the record o
 - context7 MCP: strongly recommended, never required.
 
 ## Labels
-Spec set: epic, feature, security, performance, bug, documentation, duplicate, help wanted, invalid, question, wontfix, confirmed, subtask — **plus `blocked`** (added to support exec's skip-and-continue behavior).
+Spec set: epic, feature, security, performance, bug, documentation, duplicate, help wanted, invalid, question, wontfix, confirmed, subtask — **plus `blocked`** (exec's skip-and-continue), **`needs-triage`** (quick capture), and **`sev:critical/high/medium/low`** (findings only — `feature` never carries severity: an absent capability isn't a measurable failure).
 - `confirmed` = bug reproduced.
 
 ## Naming
 - Everything under `/n8-` including `/n8-audit` (spec's `/audit` renamed for namespace consistency).
+
+## Conventions absorbed from prior projects (2026-08-27 assessment of AutoNate + n8PDF)
+- **Fingerprints**: repeatable-process issues (audits) end with `<!-- fingerprint: rule|path|symbol -->`; re-runs bulk-load prior issues and three-way dedupe (open → comment, closed → reopen as regression, absent → file).
+- **Working discipline** (all in reference/github.md): plan-comment on the issue before code; `Refs #N` never closing keywords in commits (no-ops off default branch); post-merge issue-state check + reopen for partial work (linked issues auto-close on merge); push-before-close; closing comments carry evidence (branch@SHA, AC checked, exact test counts); discovered work is filed (`needs-triage`, "Discovered while working #N"), never fixed inline; the four Nevers (no unverified closes, no bulk closes, no touching others' issues, no self-initiated "not planned").
+- **Native gh flags** (`--parent`, `--add-blocked-by`, gh ≥ 2.94.0 with preflight warn) preferred over raw API; `--body-file` always; capability-probe rather than assume (issue types are org-only, unused).
+- **Audit contract** (n8-audit + reference/audit-checklists.md): one severity rubric mapped to `sev:*`; parallel one-concern-per-agent sweeps with self-verification before reporting; evidence bar ("state the concrete failure and the path to it, or don't file"); three-section report (punch list ≤15 / checked-and-clean / out-of-scope); per-dimension checklists including the dead-code trial-delete rule, hot-path inventory (`.n8/memory/hot-paths.md`), computed-not-eyeballed contrast, WCAG criterion per 508 finding; recommend permanent versions of recurring concerns (analyzers with rationale'd suppressions, executable gate tests); **tests** added as a seventh audit dimension.
+- **Project invariants**: declared during roadmap in the project CLAUDE.md; exec treats an apparent breach as a blocker; audits check them (unexplained suppressions are findings).
+- **Stories**: sized to one session; every AC testable or the story splits; test plan names the specific proving tests. Epic AC patterns: "implemented or closed with the reason", docs-update obligation, invariants clause, tier-by-leverage children.
+- **Verify**: changed snapshots/goldens are claims, not results — the diff must be argued correct. Verify offers (never auto-runs) `gh release create --generate-notes` when a closed milestone is shippable.
+- **Init**: analyzers/linters wired into the build at scaffold time; SECURITY.md + private vulnerability reporting on public repos (public register for own findings, private channel for outside reporters).
+- **`/n8-file`**: quick capture completing the capture → assess → execute ladder.
+- **Skill maintenance**: project skills fixed in the same commit as the code change that invalidated them; cleanup audit catches residual drift.
+- Deliberately *not* adopted: n8PDF's closed-world label taxonomy (spec's label list kept, severity axis added alongside), its no-milestones model, and per-issue linked branches (`gh issue develop`) — milestone branches remain the unit of work.

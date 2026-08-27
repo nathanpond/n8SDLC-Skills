@@ -21,6 +21,7 @@ Read `${CLAUDE_PLUGIN_ROOT}/reference/github.md` and `${CLAUDE_PLUGIN_ROOT}/refe
 Work story by story against acceptance criteria — the AC checkboxes are the contract:
 
 - Run the full automated test suite; confirm the tests each story's test plan promised actually exist and pass. A green suite with missing promised tests is a failure.
+- **A changed snapshot/golden is a claim, not a result.** If any snapshot, golden file, or recorded baseline was updated during execution, review the diff and confirm the new output is *correct* — a golden regenerated to make a test pass proves nothing. The verification record must say why the new output is right.
 - **--auto:** exercise each AC directly where possible — run the app, hit the endpoints, drive the UI, inspect outputs. Prefer evidence over inspection: "I called it and observed X" beats "the code looks right".
 - **--testplan:** write numbered manual steps per story (setup, action, expected result) and present them.
 
@@ -38,5 +39,7 @@ Then offer to run a fix pass immediately (`/n8-exec` scoped to the new bugs on a
 ## 4. Close and report
 
 A milestone passes when: every AC is verified (agent-verified or user-approved manual steps), promised tests exist and pass, and no open `confirmed` bugs remain in it. Then close the milestone (`gh api -X PATCH repos/$R/milestones/<id> -f state=closed`).
+
+When a closed milestone represents shippable value (feature milestones especially, and always the final one), **offer a release**: `gh release create <tag> --title <tag> --generate-notes` — release notes generate from merged PR titles, which is one reason PR titles carry their issue numbers. The user decides tag and timing; don't release unasked.
 
 Report per milestone: verified AC count, evidence highlights, manual steps awaiting the user (if any), bugs filed, closed or still open and why — honestly; a milestone that limps through is reported as such. Suggest the next step: fix pass, remaining verifications, next `/n8-exec`, or `/n8-audit` if all feature milestones are done.

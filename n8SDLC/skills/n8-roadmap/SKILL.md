@@ -18,6 +18,7 @@ The user describes the overall goal, expected features, and acceptance criteria.
 - Non-functional needs that become epics or AC: auth, performance targets, accessibility (508), offline, data retention.
 - **Infrastructure (feeds M0):** where will the application be deployed, and how? What environments exist (dev/stage/production) and where does each live? Databases, secrets, third-party services?
 - **CI (feeds the CI milestone):** GitHub Actions unless the user specifies otherwise; where do dev/stage/production deployments go and what triggers them?
+- **Project invariants:** load-bearing constraints no story may breach without an explicit conversation — e.g. dependency policy ("zero third-party packages in the core library"), a deliberately small public API surface, warnings-as-errors, data-residency rules. Propose candidates from what you've heard; the user confirms. Record them in the project CLAUDE.md's n8SDLC section — `/n8-exec` treats an apparent breach as a blocker, and `/n8-audit` checks them mechanically (including hunting suppressions that weaken them).
 
 Record deployment/CI answers in `.n8/config.yml` under `deployment:` and `ci:` — execution must never have to re-ask.
 

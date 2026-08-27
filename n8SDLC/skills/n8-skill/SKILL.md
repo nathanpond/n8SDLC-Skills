@@ -32,3 +32,5 @@ If the `skill-creator` skill is available in this session, invoke it and build w
 **3. Test it.** Exercise the skill on a realistic task (subagent if available, inline otherwise). Does following only the written instructions produce the right result? Fix what confused it.
 
 **4. Land it.** Commit to the project (`chore: add <name> skill`). If planning suggested this skill for specific stories, comment on those issues that the skill now exists. Tell the user the trigger phrase.
+
+**5. Keep it alive.** Skills grounded in real paths and symbols rot as the code moves. Two standing rules, and the skill you generate should state them in its own body: treat each step as a claim that may have rotted — verify paths/symbols still match before following them; and when code changes invalidate a skill step, **fix the skill in the same commit as the change** ("later" won't happen). `/n8-audit cleanup` checks for skill drift, but same-commit maintenance is what keeps it from accumulating.

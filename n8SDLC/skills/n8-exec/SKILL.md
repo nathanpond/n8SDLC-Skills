@@ -22,14 +22,19 @@ Resolve targets (`M0`, `M1,M2`, or `*` = all planned, unexecuted milestones), th
 
 1. **Branch:** `milestone/m<N>-short-name` off up-to-date `main`.
 2. **Order stories** by dependencies (native `blocked_by` plus body-line fallbacks). Within a story, follow its subtasks — they are the prescribed *how*; deviating from a subtask is a decision (log it, with why).
-3. **Per story:** implement to satisfy every acceptance criterion, write the tests named in its test plan, and run the full test suite — a story is done only when all tests pass, not just its own. Commit per story (`feat: <summary> (#N)`), comment a brief completion note on the issue, and check off its AC boxes.
+3. **Per story:**
+   - Read it fully first (`gh issue view <n> --comments`), then **comment the plan before the code**: 2–5 bullets — approach and expected files. If AC are missing, derive them into this comment as a checklist; the definition of done gets written down before work starts.
+   - Implement to satisfy every acceptance criterion; respect the project invariants in CLAUDE.md's n8SDLC section — a story that appears to require breaching one is a blocker (that's a conversation, not a judgment call).
+   - **Discovered work is filed, not fixed:** a separate problem found along the way gets its own issue (`--label needs-triage`, body starting "Discovered while working #N."), cross-referenced in a comment — never fixed inline. That's silent scope creep.
+   - Write the tests named in the story's test plan and run the **full** suite — a story is done only when all tests pass, not just its own. Never finish by weakening the gate (suppressing warnings, skipping tests).
+   - Commit per story with `Refs #N` in the body (never `Fixes`/`Closes` — closing keywords are silent no-ops off the default branch), push, then check off the AC boxes and comment completion **with evidence**: branch @ short SHA, what changed per AC, exact test results. Push before any close — a closed issue with no code on the remote is a lie.
 4. **Log decisions as you go** to `.n8/decisions.md` (format in `reference/state.md`): any choice between alternatives, assumption, or plan deviation, with the why and the issue number. During autonomous runs this log is the user's only window into your judgment — err toward logging.
-5. **PR:** open a PR from the milestone branch with a body listing `Closes #N` for every completed story. If CI exists, wait for it; merge only when green (fix failures — they're part of the milestone). If CI doesn't exist yet (e.g. during M0), run the full local test suite as the gate, merge, and say so in the report.
-6. **Do not close the milestone** — that's `/n8-verify`'s job. Issues close via the PR merge.
+5. **PR:** open a PR from the milestone branch with a body listing `Closes #N` for every **completed** story (never partial ones). If CI exists, wait for it; merge only when green (fix failures — they're part of the milestone). If CI doesn't exist yet (e.g. during M0), run the full local test suite as the gate, merge, and say so in the report. **After the merge**, check `gh issue view <n> --json state` on every story touched but not finished — GitHub auto-closes linked issues on merge regardless of keywords; reopen any casualty with "Reopened: closed by the merge, not by completion. <what is left>".
+6. **Do not close the milestone** — that's `/n8-verify`'s job. Issues close via the PR merge. Observe the four Nevers from `reference/github.md`: no closing what you didn't verify, no bulk closes, no touching issues you didn't create undirected, no "not planned" on your own initiative.
 
 ## 3. Blockers: skip, mark, continue
 
-Ask nothing mid-run. When you legitimately don't know how to proceed **and the cost of guessing wrong is high** (schema shape, security posture, destructive/irreversible steps, external spend):
+Ask nothing mid-run. When you legitimately don't know how to proceed **and the cost of guessing wrong is high** (schema shape, security posture, destructive/irreversible steps, external spend, breaching a declared project invariant):
 
 1. Comment the specific question and the options you considered on the issue; add the `blocked` label.
 2. Log it in `.n8/decisions.md` as a blocker entry.

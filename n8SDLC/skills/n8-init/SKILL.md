@@ -12,6 +12,7 @@ Read `${CLAUDE_PLUGIN_ROOT}/reference/github.md` (labels, templates, conventions
 ## 1. Preflight
 
 - `gh auth status` — if not authenticated, stop and tell the user to run `gh auth login`. Nothing downstream works without it.
+- `gh --version` — warn (don't block) below 2.94.0: sub-issue (`--parent`) and dependency (`--add-blocked-by`) flags need it; everything else works, hierarchy degrades to body conventions.
 - If `.n8/config.yml` already exists, report what's already initialized and only perform missing steps.
 
 ## 2. Shell project
@@ -20,6 +21,8 @@ Inspect the folder for an existing project using the detection markers in `${CLA
 
 - **Found:** confirm the detected stack with the user and record it.
 - **Not found:** ask what should be created — offer the five first-class stacks plus "something else". For a first-class stack, follow its reference file's Scaffold section. For anything else, ask enough questions (language, project shape, test framework) to scaffold sensibly with that ecosystem's standard generator.
+
+Either way, wire the stack's **analyzers/linters into the build** from day one (the stack file's Tests/quality section names them) — build-time analysis is the always-on layer the audits lean on. Where rules get tuned down, the suppression config carries a one-line rationale per rule; audits treat unexplained suppressions as findings.
 
 ## 3. Git repo and remote
 
@@ -47,6 +50,7 @@ Check visibility. For **public** repos, enable and verify:
 - CodeQL default setup: `gh api -X PATCH repos/$R/code-scanning/default-setup -f state=configured` (fall back to committing a CodeQL workflow if default setup isn't available for the language).
 - Secret scanning + push protection: `gh api -X PATCH repos/$R -f 'security_and_analysis[secret_scanning][status]=enabled' -f 'security_and_analysis[secret_scanning_push_protection][status]=enabled'`.
 - Branch ruleset on `main`: require a PR and passing status checks before merge (fits the milestone-PR flow). Name the CI check requirement once CI exists; create the ruleset now with PR-required and note that the check requirement gets added by the CI milestone.
+- Private vulnerability reporting: `gh api -X PUT repos/$R/private-vulnerability-reporting`, plus a `SECURITY.md` that routes external reporters: findings from the project's own audits are public issues under the `security` label; suspected vulnerabilities from outsiders go through private reporting, never a public issue ("a public reproduction is a working exploit handed to everyone"). State honest response expectations rather than promising SLAs the user can't keep — ask what they can commit to.
 
 For **private** repos, state honestly which of these need GitHub Advanced Security and skip them; still write `dependabot.yml` (works on private repos).
 

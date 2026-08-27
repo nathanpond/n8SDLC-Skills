@@ -19,6 +19,8 @@ Parse the argument: a single milestone (`M0`), a comma list (`M1,M2`), or `*` (a
 
 ## 2. Interrogate per milestone
 
+First, sweep `needs-triage` issues (quick captures from `/n8-file` and discovered-work filings): for each, propose with the user whether it becomes a story in a targeted milestone, folds into an existing issue's AC, or waits. Triage is planning's job — captures shouldn't accumulate.
+
 For each milestone, study its epics and phases, then ask everything execution would otherwise have to guess. Themes that recur:
 
 - Concrete technology and library choices (verify current APIs/versions via context7 when available — plans built on stale docs produce broken code).
@@ -33,9 +35,10 @@ Batch questions sensibly rather than dribbling them one at a time. Skip question
 
 For each unit of work, run the duplicate check first (ask the user on related-but-different matches: extend existing AC or new issue?). Then:
 
-- **Story** — `feature` (or `bug`/`security`/`performance`/`documentation`) label, story body template: the *what*, testable acceptance criteria, and a **test plan** naming the automated tests to write. Every story that changes behavior gets tests in its own scope — the milestone's definition of done includes all tests passing, so untested stories are incomplete stories. Assign to the milestone. Attach as a **sub-issue of its epic**.
+- **Story** — `feature` (or `bug`/`security`/`performance`/`documentation`) label, story body template: the *what*, testable acceptance criteria, and a **test plan** naming the specific automated tests that will prove it. If an AC cannot be written as something testable, the story is too vague — split it or ask; if the work genuinely can't be demonstrated by a test, the story must say so explicitly and state how it will be checked instead. Size stories so one fits in a single working session — oversized stories are where autonomous execution stalls. Every story that changes behavior gets tests in its own scope — the milestone's definition of done includes all tests passing, so untested stories are incomplete stories. Assign to the milestone. Attach as a **sub-issue of its epic**.
 - **Subtask** — `subtask` label, only where the *how* genuinely needs prescribing (specific files, patterns, gotchas, sequences). Attach as a sub-issue of its story. Don't manufacture subtasks for self-evident implementations.
-- **Dependencies** — wire `blocked_by` relationships (native API, body-line fallback per `reference/github.md`) wherever order matters. Execution follows these strictly.
+- **Dependencies** — wire `blocked_by` relationships (native flags, body-line fallback per `reference/github.md`) wherever order matters; ordering lives in the graph, not in prose. Execution follows these strictly.
+- **Epic AC patterns** worth using where they fit: "each child implemented *or closed with the reason it will not be*" (so an epic can complete honestly without every idea surviving); a docs/wiki-update obligation tied to children landing; an explicit "nothing here weakens the project invariants" clause. For epics with many candidate children, tier them by leverage (highest return → hygiene), one line of justification per child — it makes descoping decisions legible later.
 - Update the milestone description's phase list to reflect the final story set.
 
 ## 4. Whole-project analysis (after all targeted milestones are planned)
