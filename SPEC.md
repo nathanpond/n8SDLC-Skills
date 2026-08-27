@@ -68,7 +68,14 @@ Trimmed middle path (decided 2026-08-27 after the label-philosophy discussion): 
 ## Releases (decided 2026-08-27)
 - Dedicated **/n8-release** command, **tag-on-main model**: milestone PRs merge to main continuously; a release tags a verified commit on main (never a gitflow-style gated main — rejected for integration debt, broken `Closes #N`, and conflicts with the ruleset/verify/drift machinery). Dev/stage deploy from main merges; production deploys on release tags where CI defines it.
 - Hard preconditions: contributing milestones verified-closed, CI green on main, no open confirmed bugs. Version files bumped to match the tag. Explicit user confirmation before tagging — releases never run unasked. Tag-triggered workflows are watched to completion; a failed deploy is reported, not hidden.
-- **Init**: analyzers/linters wired into the build at scaffold time; SECURITY.md + private vulnerability reporting on public repos (public register for own findings, private channel for outside reporters).
+- **Init**: analyzers/linters wired into the build at scaffold time; SECURITY.md + private vulnerability reporting on public repos (private channel for outside reporters, never public issues).
+
+## Security-finding routing (decided 2026-08-27)
+- **Init-time user choice**, `security_findings: issues | advisories` in `.n8/config.yml` (asked only on public repos — private-repo issues are already maintainer-only):
+  - `issues` — public register under the `security` label; full milestone/fingerprint integration. Right for libraries/tools.
+  - `advisories` — self-found security findings become **draft security advisories** (maintainer-only until published; the object GitHub's private vulnerability reporting feeds). Right for deployed services, where an open sev:high public issue advertises an exploit against production. Advisories carry the fingerprint, count toward the Audit milestone's done, and on fix are published plus a filed-and-closed public issue for register/dedupe continuity.
+- Per-issue/per-label privacy on public-repo issues does not exist on GitHub — advisories are the only maintainer-only surface, which is why this is an object choice, not a label choice.
+- Universal resolution rule: an accepted vulnerability is fixed with a regression test that builds the attack.
 - **`/n8-file`**: quick capture completing the capture → assess → execute ladder.
 - **Skill maintenance**: project skills fixed in the same commit as the code change that invalidated them; cleanup audit catches residual drift.
 - Deliberately *not* adopted: n8PDF's closed-world label taxonomy (spec's label list kept, severity axis added alongside), its no-milestones model, and per-issue linked branches (`gh issue develop`) — milestone branches remain the unit of work.

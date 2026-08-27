@@ -15,6 +15,7 @@ Every dimension shares the verification rule: **verify each finding yourself bef
 - **Network/SSRF:** outbound requests whose URL derives from user input; missing allowlists on webhook/callback targets.
 - **Untrusted file/input parsing:** for any parser of externally supplied bytes, ask what a hostile input *gets out of it* — memory, CPU, a crash, wrong output — and weight those findings above everything else. Fuzz where applicable.
 - **Anonymous-endpoint sanity:** list everything reachable without auth; each must justify itself.
+- **Resolution rule:** an accepted vulnerability is fixed *with a regression test that builds the attack* — the crafted input or request sequence becomes a permanent test. A security fix without its attack-as-test is unverified.
 
 ## Authorization (distinct from security scanning)
 

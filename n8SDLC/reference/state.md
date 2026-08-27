@@ -27,6 +27,7 @@ deployment:
   notes: <how the app is deployed, hosting decisions>
 ci: github-actions       # or whatever the user chose
 context7: installed      # installed | declined
+security_findings: issues  # issues | advisories — how /n8-audit logs the project's own security findings
 ```
 
 Skills read `wiki:` before touching wikis. `opted-out` means the user said no — skip all wiki work silently, don't re-ask.
