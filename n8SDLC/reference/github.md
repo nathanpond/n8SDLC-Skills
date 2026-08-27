@@ -72,7 +72,7 @@ Always `--body-file <tmpfile>`, not `--body` — heredocs and inline quoting ins
 ## Dependencies (blocked by / blocks)
 
 ```bash
-gh issue create ... --add-blocked-by $BLOCKER_NUM      # at creation
+gh issue create ... --blocked-by $BLOCKER_NUM          # at creation (NOT --add-blocked-by — that flag exists only on edit)
 gh issue edit $NUM --add-blocked-by $BLOCKER_NUM       # after the fact
 gh api repos/$R/issues/$NUM/dependencies/blocked_by    # read
 ```
@@ -97,7 +97,7 @@ gh api -X POST repos/$R/milestones -f title="M1: Core API" -f description="..."
 
 ## Duplicate check — before creating ANY issue
 
-(One shortcut: if you've verified this session that the repo has zero issues — `gh issue list --state all --limit 1` returns empty — skip per-issue searches until the first issue is created.)
+(Shortcuts: if you've verified this session that the repo has zero issues — `gh issue list --state all --limit 1` returns empty — skip per-issue searches until the first issue is created. And when the whole backlog fits one call (`gh issue list --state all --limit 100 --json number,title,state`), load it once and dedupe in memory instead of running per-issue searches.)
 
 1. Search: `gh issue list --state all --search "<keywords>" --json number,title,state` — search by **concept, not your exact phrasing**; try a couple of keyword variants.
 2. Exact or near-exact **open** match → do not create. Report the existing issue.

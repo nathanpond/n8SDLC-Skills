@@ -12,7 +12,7 @@ Read `${CLAUDE_PLUGIN_ROOT}/reference/github.md`, `${CLAUDE_PLUGIN_ROOT}/referen
 
 ## 1. Resolve targets
 
-Parse the argument: a single milestone (`M0`), a comma list (`M1,M2`), or `*` (all open milestones not yet planned — a milestone counts as planned when it has stories assigned). Match against actual milestone titles (`M0: …`). Requirements:
+Parse the argument: a single milestone (`M0`), a comma list (`M1,M2`), or `*` (all open milestones not yet planned — a milestone counts as planned when it has stories assigned). Match milestones by `M<N>:` prefix, never full title. **The Audit milestone is exempt from `*` and counts as planned once its description carries the audit emphases** (written by the whole-project analysis below) — it gets stories from `/n8-audit` findings, never pre-created ones. Requirements:
 
 - `/n8-roadmap` must have run (epics + milestones exist); otherwise say so and stop.
 - Plan milestones in order. If the user asks for M2 but M1 is unplanned, point it out and ask whether to proceed anyway — later plans usually depend on earlier decisions.
@@ -21,7 +21,7 @@ Parse the argument: a single milestone (`M0`), a comma list (`M1,M2`), or `*` (a
 
 First, sweep `needs-triage` issues (quick captures from `/n8-file` and discovered-work filings): for each, propose with the user whether it becomes a story in a targeted milestone, folds into an existing issue's AC, or waits. Triage is planning's job — captures shouldn't accumulate.
 
-When planning M0 or the CI milestone, check the project invariants in CLAUDE.md: every invariant marked test-enforced needs a story creating its **executable guard** (a test or build setting that fails when the invariant is breached — package-count test, public-API snapshot, warnings-as-errors). If a guard story is missing, add it and update the invariant's marking once it lands.
+When planning M0 or the CI milestone, check the project invariants in CLAUDE.md: every invariant marked test-enforced needs a story creating its **executable guard** (a test or build setting that fails when the invariant is breached — package-count test, public-API snapshot, warnings-as-errors). A guard lives in the milestone where its *subject* first exists — a storage-format compat fixture can't precede the format, so that guard belongs with the storage milestone; M0/CI hosts the ones that can run from day one. Annotate each invariant in CLAUDE.md with its guard story (`guard: #5`); the **test-enforced** marking becomes true only when the guard *code merges*, not when the story is filed.
 
 For each milestone, study its epics and phases, then ask everything execution would otherwise have to guess. **Derive question areas from the shape of what's being built, never generic categories**: something users SEE → states, interactions, visual behavior; something users CALL → contracts, responses, errors; something users RUN → invocation, flags, output; something being ORGANIZED → criteria, grouping, exceptions. ("User authentication" → session handling, error responses, multi-device policy, recovery flow — not "UI/UX/Behavior".)
 
@@ -59,7 +59,8 @@ For each unit of work, run the duplicate check first (ask the user on related-bu
 - **Subtask** — `subtask` label, only where the *how* genuinely needs prescribing (specific files, patterns, gotchas, sequences). Attach as a sub-issue of its story. Don't manufacture subtasks for self-evident implementations.
 - **Dependencies** — wire `blocked_by` relationships (native flags, body-line fallback per `reference/github.md`) wherever order matters; ordering lives in the graph, not in prose. Execution follows these strictly.
 - **Epic AC patterns** worth using where they fit: "each child implemented *or closed with the reason it will not be*" (so an epic can complete honestly without every idea surviving); a docs/wiki-update obligation tied to children landing; an explicit "nothing here weakens the project invariants" clause. For epics with many candidate children, tier them by leverage (highest return → hygiene), one line of justification per child — it makes descoping decisions legible later.
-- Update the milestone description's phase list to reflect the final story set.
+- **Create in dependency order** (blockers before dependents) so `--blocked-by` and body cross-references carry real numbers; where a forward reference is unavoidable, fix it afterward with one `gh issue edit --body-file` pass — never leave `#TBD` behind.
+- Update the milestone description's phase list to reflect the final story set. Expect this to *restructure* roadmap's coarse phases — roadmap often sketches horizontal layers ("storage / commands / output") that granular planning correctly re-slices into vertical stories; note the restructuring in the description edit rather than preserving a phase list the stories no longer match.
 
 ## 4. Whole-project analysis (after all targeted milestones are planned)
 
