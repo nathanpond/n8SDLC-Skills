@@ -219,16 +219,27 @@ The **Must-haves** block is derived goal-backward at plan time and cashed by `/n
 
 - One branch per milestone: `milestone/m1-short-name`.
 - Commit per story on that branch; reference the story in the commit body as `Refs #N` (and optionally the subject: `feat: user login (#12)`). Never closing keywords in commits — see Working discipline.
-- One PR per milestone. The PR body lists `Closes #N` for every **completed** story (the PR merges to the default branch, so these fire correctly) — never for partially done stories. Merge only when CI is green (once CI exists), then run the post-merge state check on every story that was touched but not finished.
+- One PR per milestone. The PR body lists `Closes #N` for every **completed** story **and completed subtask** (subtasks close with their parent story's PR — otherwise they dangle open under a closed parent); the PR merges to the default branch, so these fire correctly. Never list partially done issues. Merge only when CI is green (once CI exists), then run the post-merge state check on every story that was touched but not finished.
 
-**Waiting on CI** (autonomous runs): `gh pr checks --watch --interval 15` for the simple case. When checks may not have registered yet, use the race-proof loop — the `length > 1` guard defeats the window where zero checks exist and "none pending" is trivially true:
+**Waiting on CI** (autonomous runs): `gh pr checks --watch --interval 15` for the simple case. The polling form has two races to defeat: zero checks registered yet ("none pending" is trivially true), and — after pushing a new commit — the loop seeing the *previous* SHA's completed checks and exiting early. So: sleep first, then require at least one check:
 
 ```bash
+sleep 20   # let checks for the just-pushed SHA register
 until gh pr checks --json name,bucket 2>/dev/null \
-      | jq -e 'length > 1 and all(.bucket != "pending")' >/dev/null; do sleep 15; done
+      | jq -e 'length > 0 and all(.bucket != "pending")' >/dev/null; do sleep 15; done
 ```
 
-Habitually truncate `gh` output (`| tail -2`, `--jq` projections) — long runs die by context, not by errors.
+Habitually truncate `gh` output (`| tail -2`, `--jq` projections) — long runs die by context, not by errors. But **never pipe a command whose success gates a close** (`git push 2>&1 | tail -1` eats the exit status and reports failure as success) — run it bare, or `set -o pipefail` first.
+
+**Non-TTY note:** `gh issue view <n> --comments` can print nothing outside a TTY. In autonomous runs, read issues with `--json title,body,comments`.
+
+**Ticking AC checkboxes** on an issue:
+
+```bash
+gh issue view $N --json body --jq .body | sed 's/^- \[ \]/- [x]/' > "$SCRATCH/body.md" && gh issue edit $N --body-file "$SCRATCH/body.md"
+```
+
+That ticks *every* box — correct only when the story is fully done; for partial work, edit the body selectively instead.
 
 ## GitHub Actions lessons (for the CI milestone and generated workflows)
 

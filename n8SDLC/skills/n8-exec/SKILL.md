@@ -12,7 +12,7 @@ Read `${CLAUDE_PLUGIN_ROOT}/reference/github.md`, `${CLAUDE_PLUGIN_ROOT}/referen
 
 ## 1. Preconditions (hard stops)
 
-Resolve targets (`M0`, `M1,M2`, or `*` = all planned, unexecuted milestones), then verify **before touching any code**:
+Resolve targets (`M0`, `M1,M2`, or `*` = all planned, unexecuted milestones — matching by `M<N>:` prefix). Under `*`, an open milestone skipped for having no stories must be **reported, not silently dropped** ("skipping M3 — unplanned; run /n8-plan M3"; the Audit milestone is exempt and expected to be storyless). Then verify **before touching any code**:
 
 - **Planned:** every targeted milestone has stories. If not → tell the user which milestone is unplanned, suggest `/n8-plan <M>`, and stop.
 - **In order:** every earlier milestone is already executed (its stories closed / milestone PR merged). If not → tell the user which milestone must run first and stop. Milestones build on each other; out-of-order execution produces integration debt.
@@ -23,7 +23,7 @@ Resolve targets (`M0`, `M1,M2`, or `*` = all planned, unexecuted milestones), th
 1. **Branch:** `milestone/m<N>-short-name` off up-to-date `main`.
 2. **Order stories** by dependencies (native `blocked_by` plus body-line fallbacks). Within a story, follow its subtasks — they are the prescribed *how*; deviating from a subtask is a decision (log it, with why).
 3. **Per story:**
-   - Read it fully first (`gh issue view <n> --comments`), then **comment the plan before the code**: 2–5 bullets — approach and expected files. If AC are missing, derive them into this comment as a checklist; the definition of done gets written down before work starts.
+   - Read it fully first (`gh issue view <n> --json title,body,comments` — the plain `--comments` form can print nothing outside a TTY), then **comment the plan before the code**: 2–5 bullets — approach and expected files. If AC are missing, derive them into this comment as a checklist; the definition of done gets written down before work starts.
    - Implement to satisfy every acceptance criterion; respect the project invariants in CLAUDE.md's n8SDLC section — a story that appears to require breaching one is a blocker (that's a conversation, not a judgment call). The story's **Claude's Discretion** section is the inverse: decisions the user explicitly delegated — improvise there freely and log the choice.
    - **You WILL discover work the plan missed — this is normal. What you may do about it depends on where it sits:**
      - *Inside this story's scope* (in code the story touches, needed for it to be correct/secure/complete): **Rule 1** — fix bugs (broken behavior, logic errors, races) + add a regression test. **Rule 2** — add missing critical functionality (input validation, error handling, authz on protected routes — requirements for basic correctness, not features). **Rule 3** — fix blockers (broken import, missing dep, build config). All three: fix automatically, log to the decision ledger with the rule tag.

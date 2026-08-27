@@ -25,7 +25,7 @@ Write-discipline per section — **update the issue BEFORE acting, not after**: 
   - `Eliminated: <hypothesis> — <the evidence that killed it>`
   - `Evidence: checked <thing> — found <result> — implies <what>`
 
-**Resume after any reset:** `gh issue view <n> --comments` — Symptoms say what's broken, Current focus says what was in flight, the Eliminated comments say **what not to retry**. Continue from Next action.
+**Resume after any reset:** `gh issue view <n> --json title,body,comments` — Symptoms say what's broken, Current focus says what was in flight, the Eliminated comments say **what not to retry**. Continue from Next action.
 
 ## Investigation discipline
 
