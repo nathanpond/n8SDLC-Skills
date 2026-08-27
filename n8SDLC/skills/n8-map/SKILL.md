@@ -7,7 +7,9 @@ description: Map an existing (brownfield) codebase before planning n8SDLC work o
 
 Roadmapping and planning assume you understand the codebase; on a project that predates n8SDLC, build that understanding once and write it down where every later skill can read it. Run after `/n8-init`, before `/n8-roadmap`, on any non-trivial existing codebase.
 
-Read `${CLAUDE_PLUGIN_ROOT}/reference/state.md`. Output lands in the **wiki** (`wiki: enabled`) or `docs/codebase/` (wiki opted out) — never a bespoke state directory.
+Read `${CLAUDE_PLUGIN_ROOT}/reference/state.md`. Output lands in the **wiki** (`wiki: enabled`) or `docs/codebase/` (wiki opted out; filenames `Stack.md`, `Integrations.md`, `Architecture.md`, `Structure.md`, `Conventions.md`, `Testing.md`, `Concerns.md`) — never a bespoke state directory.
+
+The canonical time to run is after `/n8-init`, before `/n8-roadmap` — but mapping mid-project is legitimate (post-pivot, or docs drifted): everything below applies the same, except the closing suggestion, which should fit the project's actual stage (usually: read the filed concerns before the next `/n8-exec`).
 
 ## Four parallel mappers, writing directly to disk
 
@@ -18,7 +20,7 @@ Fan out four agents concurrently, each owning a focus and **writing its pages it
 | stack | Stack, Integrations | languages, frameworks, versions, external services, env vars, how to build/run/test |
 | architecture | Architecture, Structure | components and boundaries, data flow, key abstractions; directory map — "where do I put this?" |
 | conventions | Conventions, Testing | naming, patterns, error handling, state management — with code examples; how tests are organized and run |
-| concerns | Concerns | tech debt, known bugs, security risks, perf bottlenecks, fragile areas — each as Issue / Files / Impact / Fix approach |
+| concerns | Concerns | tech debt, known bugs, security risks, perf bottlenecks, fragile areas — each as Issue / Files / Impact / Fix approach. **Behavioral claims ("never settles", "leaks", "races") must be demonstrated, not inferred** — run the code; a claim the mapper couldn't exercise is marked *unverified (static analysis only)* or dropped |
 
 Give every mapper the same writing contract — the output quality lives or dies on it:
 
@@ -29,6 +31,6 @@ Give every mapper the same writing contract — the output quality lives or dies
 
 ## Then, in the orchestrator
 
-1. Stamp each page (or an index page) with the commit SHA it was generated from — the freshness check is `git log <sha>..HEAD --stat`, not a bespoke staleness index. `/n8-wiki` reconciles these pages like any others.
-2. **Concerns become issues:** walk the Concerns page with the user; approved items are filed via the standard duplicate check with `needs-triage` (or their real type when obvious), an `area:*` label, and `sev:*` where the concern is a finding. This is how the map feeds the roadmap — existing debt competes for milestones alongside new features.
+1. Stamp **each page** with the commit SHA it was generated from — the freshness check is `git log <sha>..HEAD --stat`, not a bespoke staleness index. `/n8-wiki` reconciles these pages like any others.
+2. **Concerns become issues** — the one page the orchestrator does read (the confirmations-only rule covers the other six): verify each behavioral claim empirically before presenting — mappers produce confident false findings, and this walk is the safety net; then walk the page with the user; approved items are filed via the standard duplicate check with `needs-triage` (or their real type when obvious), an `area:*` label, and `sev:*` where the concern is a finding. This is how the map feeds the roadmap — existing debt competes for milestones alongside new features.
 3. Report: pages written, concern count filed vs. deferred, and anything surprising enough that the user should read it before `/n8-roadmap`. Suggest `/n8-roadmap` as the next step — its epics should be planned *against* this map.
