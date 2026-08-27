@@ -30,9 +30,33 @@ Either way, wire the stack's **analyzers/linters into the build** from day one (
 - If no `origin` remote: ask the user to supply a GitHub remote URL (they create the repo on GitHub themselves — don't create it for them). Add it, then verify access with `gh repo view`.
 - Don't push yet; the initial push happens at the end.
 
+## 3b. Existing-conventions scan (before mutating anything)
+
+A project may already have a homegrown workflow — its own skills, commands, CLAUDE.md conventions, label taxonomy. Dropping n8SDLC on top without reconciling produces the worst of both: CLAUDE.md is always in context while skills load on invocation, so contradictory conventions don't lose to the plugin — they blend with it unpredictably. Scan before creating anything:
+
+- `.claude/skills/`, `.claude/commands/`, `.claude/agents/`, hooks in settings — anything whose domain overlaps what n8SDLC owns (issue workflow, branching/PRs, planning, audits, releases, wiki).
+- CLAUDE.md sections prescribing process in those domains.
+- Existing labels (`gh label list`) vs. the n8SDLC set; existing milestones; existing `.github/ISSUE_TEMPLATE/`; other plugins' state directories (`.planning/` etc.).
+- Project auto-memory entries that prescribe workflow.
+
+Classify each overlapping item and present the list:
+
+- **Complementary** — project-specific capability skills (a plugin-creator, a domain recipe, a deploy runbook): **keep**. These are exactly what `/n8-skill` produces; n8SDLC is their host, not their replacement.
+- **Conflicting** — prescribes contradictory process in a domain n8SDLC now owns (its own issue/branch/close workflow, its own audit filing, its own planning loop).
+- **Redundant** — fully covered by an n8SDLC skill with no contradiction.
+
+Then resolve item by item with the user — never silently:
+
+1. **Harvest before removing.** Homegrown skills usually encode hard-won project knowledge (tuned audit checklists, hot-path inventories, gotcha lists). Mine anything load-bearing into `.n8/memory/`, the wiki, or a kept project skill *before* deletion — deleting unharvested knowledge is the real cost of cleanup, not the files.
+2. **Remove only what the user approves, via git** (`git rm` + commit) so every removal is one revert away. Offer sensible defaults (remove conflicting, keep complementary), but the user decides per item.
+3. **Edit CLAUDE.md surgically:** replace the conflicting workflow sections with the n8SDLC section from step 8b; leave everything else (stack notes, invariants, domain guidance) untouched.
+4. Flag stale workflow memories and offer to update them.
+
+Touch nothing outside n8SDLC's domains — a project's unrelated skills, hooks, and docs are not yours to tidy.
+
 ## 4. Labels and issue templates
 
-- Create the baseline label set from `reference/github.md` using `--force` (idempotent).
+- Create the baseline label set from `reference/github.md` using `--force` (idempotent) — **but diff first on a repo that already has labels**: labels aren't git-tracked, so a `--force` overwrite of an existing label's color/description is silent, unrecoverable data loss against a possibly-curated taxonomy. Show the user any label whose existing color/description differs before overwriting it, never delete labels you didn't create, and on a repo with real issue history confirm before adding templates or creating milestones — their absence may be a choice.
 - Generate the project's **`area:*` labels** from its actual top-level structure (mapped to directories, not teams — e.g. `area:web`, `area:api`, `area:db`, `area:ci`, `area:infra`, `area:docs`), confirm the set with the user, create them, and record it under `areas:` in `.n8/config.yml`. Every issue filed by the workflow carries exactly one.
 - Write `.github/ISSUE_TEMPLATE/` templates for **epic**, **story**, and **bug** matching the body templates in `reference/github.md`, plus a `config.yml` with `blank_issues_enabled: false` — every issue arrives typed, whether filed by a human or an agent.
 

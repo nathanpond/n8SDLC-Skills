@@ -13,7 +13,7 @@ claude plugin install n8sdlc@n8sdlc-skills
 
 | Command | What it does |
 |---|---|
-| `/n8-init` | First command. Shell project (or scaffold one), git repo + your GitHub remote, baseline labels + issue templates, wiki check/seed, security features (public repos), recommends context7 MCP. |
+| `/n8-init` | First command. Shell project (or scaffold one), git repo + your GitHub remote, baseline labels + issue templates, wiki check/seed, security features (public repos), recommends context7 MCP. On projects with a pre-existing homegrown workflow: scans for conflicting skills/conventions, harvests their knowledge, and removes them only with per-item approval. |
 | `/n8-map` | Brownfield mapping: four parallel agents document an existing codebase's stack, architecture, conventions, and concerns into the wiki — written prescriptively for future executors; concerns become triaged issues. Run before `/n8-roadmap` on codebases that predate n8SDLC. |
 | `/n8-roadmap` | Describe the app's goal, features, and AC. Clarifying Q&A → epics (epic-level AC) + milestone skeleton: M0 Infrastructure always first, CI early, Audit always last. |
 | `/n8-plan M0` | Granular milestone planning (`M1,M2`, `*` supported). Deep Q&A so execution never has to ask. Stories (the what + AC + test plans) under epics, subtasks (the how) under stories, dependencies wired. Post-analysis suggests specialized audits and project skills. |

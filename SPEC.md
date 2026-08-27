@@ -91,6 +91,12 @@ Trimmed middle path (decided 2026-08-27 after the label-philosophy discussion): 
 - **/n8-debug** (new skill): GitHub issue as the debugging brain — body overwritten before each action (Current focus), comments append-only (Evidence / Eliminated); falsifiable hypotheses; four-condition act gate; "a fix you can't explain is luck."
 - **Rejected**: all `.planning/` file state, phase numbering/doctor/migration, template overrides, model profiles, shadow issue system, worktree orchestration, agent-teams brainstorm machinery, quick-task second pipeline. Kata's one good spine — separate the agent that judges from the agent that did the work — is adopted as prompt text, not as machinery.
 
+## Brownfield adoption / conflict handling (decided 2026-08-27)
+- `/n8-init` runs an **existing-conventions scan before mutating anything**: homegrown skills/commands/hooks, CLAUDE.md workflow sections, label/milestone/template state, other plugins' state dirs, workflow memories. Rationale: CLAUDE.md is always in context while skills load on invocation, so un-reconciled conventions blend with the plugin's rather than losing to it.
+- Classification: **complementary** (project-specific capability skills — kept; they're /n8-skill's output in spirit) / **conflicting** (contradictory process in n8SDLC-owned domains) / **redundant**.
+- Resolution rules: **harvest before removing** (mine hard-won knowledge into .n8/memory//wiki/kept skills first — losing it is the real cost); removal only per-item with user approval, via git so it's one revert away; CLAUDE.md edited surgically (workflow sections replaced, everything else untouched); nothing outside n8SDLC's domains is touched.
+- Label safety (motivated by the n8PDF collision case): labels aren't git-tracked, so init diffs existing labels and asks before any `--force` overwrite of differing color/description; never deletes labels it didn't create; confirms templates/milestones on repos with real issue history.
+
 ## Security-finding routing (decided 2026-08-27)
 - **Init-time user choice**, `security_findings: issues | advisories` in `.n8/config.yml` (asked only on public repos — private-repo issues are already maintainer-only):
   - `issues` — public register under the `security` label; full milestone/fingerprint integration. Right for libraries/tools.
