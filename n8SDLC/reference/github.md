@@ -87,7 +87,7 @@ Encode ordering with dependencies, **not prose** — execution follows the graph
 - **M0 is always infrastructure setup** (deployment targets, environments, project plumbing).
 - **CI comes early** — usually M1 or folded into M0 — covering dev/stage/production deployment via GitHub Actions unless the user chose otherwise.
 - **Audit is always last**, holding audit passes and approved audit-finding fixes.
-- The milestone description records: goal, ordered phases, the `coverage-claim` fenced block where the milestone delivers part of a totalising claim (shape defined in `/n8-roadmap`; `/n8-plan` appends the map and `## Coverage check` beneath it), and definition of done. Definition of done always includes: all issues closed, all automated tests written and passing, and `/n8-verify` passed.
+- The milestone description records: goal, ordered phases, the `coverage-claim` fenced block where the milestone delivers part of a totalising claim (shape defined in `/n8-roadmap`; `/n8-plan`'s one PATCH keeps these and appends `## Outcomes`, the map with its header, the restructured phases, `## Coverage check` and `## Executor simulation`), and definition of done. Definition of done always includes: all issues closed, all automated tests written and passing, and `/n8-verify` passed.
 - A milestone is **closed only by /n8-verify** (verification is part of done). `/n8-exec` never closes milestones.
 
 ```bash
@@ -174,7 +174,7 @@ key_links:         # the connections where stubs hide
 
 ## Demo
 <user-facing stories only: a concrete ~60-second user script — specific actions, observable
-outcomes, complete workflow. Omit for stories the agent can fully verify on its own.>
+outcomes, complete workflow. Stories the agent can fully verify on its own carry the sentinel `Demo: none — agent-verifiable` instead — `/n8-verify --auto` greps for it.>
 
 ## Test plan
 <automated tests to be written as part of this story; they must pass before the story is done>
