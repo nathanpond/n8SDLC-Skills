@@ -55,10 +55,10 @@ Every dimension shares the verification rule: **verify each finding yourself bef
 - **Dead-code claims require the trial-delete proof.** Grep lies: multi-line/destructured imports, DI registration, reflection-based discovery, dynamic import-by-name, and stale incremental-build caches all defeat it. A passing build *with the candidate still present* proves nothing. The only real verification: move the file aside, clear incremental caches, full rebuild — if that passes, it's genuinely unused. If in doubt, demote (remove the export/public) instead of deleting; a real consumer surfaces immediately.
 - Symbol names that are unique strings are grep-safe; path fragments that overlap English words are not.
 - Files that shouldn't be in source control: check `git ls-files`, not just the working tree.
-- Stale comments and docs pointing at deleted/renamed code — High severity when actively misleading, because they cause bugs.
+- Stale *code comments* pointing at deleted/renamed code, in files no corpus document cites — `sev:high` when actively misleading. Documents, and comments inside files they cite, belong to the Docs area end to end.
 - Duplicated helpers ripe for consolidation (the same 3-line accessor pasted across N files).
 - TODO/FIXME/HACK triage — each is one of: real outstanding work (→ file an issue), stale (→ delete the comment), or acknowledged tradeoff with a reason (→ leave alone). Cap at the most concerning few.
-- **Skill and memory drift:** project skills (`.claude/skills/`) and memory files whose cited paths/symbols/claims no longer match the code. Stale guidance drives bad future sessions; flagging it is itself cleanup. Also flag the inverse — live features the skills don't document.
+- **Skill and memory drift** belongs to the **Docs** section below, which owns documents end to end — existence *and* behaviour. On a cleanup-only run, list stale citations you trip over as leads for a docs run (no severity here) and say the docs pass was not run.
 - **Invariant suppressions:** warning-suppression pragmas, disabled analyzer rules without a rationale, weakened build strictness.
 - Output includes a **suggested git operations** section — copy-pasteable `git rm --cached`/`.gitignore` commands, staged for the user to review, never run by the audit.
 
@@ -76,6 +76,48 @@ Frame it as catching **escapes from the framework's baseline**: a good component
 - Motion: respect `prefers-reduced-motion`; no sub-3Hz flashing; auto-dismiss ≥ 5s.
 - Every finding cites its **WCAG success criterion** (e.g. "WCAG 1.1.1 / 508 §501"). Default to WCAG 2.0 AA (the 508 floor) and note where 2.1/2.2 criteria are cheap to adopt.
 - Out of scope, say so explicitly: VPAT/procurement docs (a compliance artifact derived from the audit, not the audit), and non-HTML deliverables.
+
+## Docs (documents against code)
+
+A wrong document in an agent-driven project is **executed**, not merely misread: the code is fine, nothing fails, and the cost lands on the next agent told to follow it. Findings here are places the description and the behaviour disagree.
+
+**Corpus.** From the project root — the directory holding `.n8/`, which may sit below the git toplevel: `P=$(pwd); T=$(git rev-parse --show-toplevel); REL=${P#$T/}` (`REL` is `.` when they coincide). Print the corpus in the report so its omissions are visible. `D=$(mktemp -d /tmp/n8-wiki.XXXXXX); git clone "https://github.com/$R.wiki.git" "$D" || { rm -rf "$D"; D=; }` — a failed clone (git says `Repository not found`, never "404") leaves an empty directory that would otherwise join the corpus; skip the wiki with a note when `D` is empty or `gh repo view --json hasWikiEnabled --jq .hasWikiEnabled` is false. Then an **array** of the members that exist — zsh does not word-split a string variable, so a space-joined string is one nonexistent path: `corpus=(); for m in .claude/skills CLAUDE.md .n8/memory README.md CONTRIBUTING.md docs "$D"; do [ -e "$m" ] && corpus+=("$m"); done`. Report what that list omits — ADRs outside `docs/` and in-app help are outside it by construction, so a clean result does not cover them. Doc-comments that instruct ("call X before Y") inside any file a corpus document cites are in scope here, stale pointer or not; Cleanup owns comments in code no document cites.
+
+**Mechanical sweeps** — leads, not findings; promote each through the evidence bar:
+
+```sh
+grep -rnE '\.(md|ts|tsx|js|py|cs|go|rb|java|sh|dart|kt|swift|rs|sql|ya?ml|razor|cshtml):[0-9]+' "${corpus[@]}"   # line-number citations
+grep -rniE '^#{1,6} *(corrections?|errata|addendum|changelog|update log)' "${corpus[@]}"
+grep -rniE '\bcopy\b|model (it|this) (on|after)|follow the pattern in|use .* as (a|the) (template|example|exemplar)' "${corpus[@]}"
+grep -rhoE '`[A-Za-z0-9_./-]+/[A-Za-z0-9_.-]+\.[a-z]{1,5}`' "${corpus[@]}" | tr -d '`' | sort -u | while read p; do [ -e "$p" ] || echo "MISSING: $p"; done   # every cited path that no longer exists (the coverage inverse; illustrative paths like src/foo.ts are leads to dismiss, not findings)
+```
+
+Never append `2>/dev/null` to a sweep: a missing corpus member must be visible, or an empty result reads as clean.
+
+Then per skill, read its frontmatter `description` against the body: every trigger phrase in the description must correspond to a step the body carries; one that doesn't is a finding (an over-claiming description mis-triggers the skill).
+
+**The independent check — the cold follow.** The docs equivalent of Cleanup's trial-delete: the one check here with a verdict. It applies to each skill that carries steps — a numbered list, or three or more imperative sentences in sequence; a reference-only skill gets the sweeps and the behavioural check but no follow, and the report says so. Order: skills named in an open story's body first — `gh issue list --state open --limit 200 --json number,body --jq '[.[] | select(.body | contains("<skill name>"))] | length'` (GitHub's search tokenises on `-` and `/`, so a `--search` phrase does not phrase-match) — then the rest alphabetically. Each skill is several tool calls (the worktree, the subagent, the removal), and variables die between calls, so write the literal skill name into each:
+
+```sh
+SKILL=plugin-creator; W=/tmp/n8-cold-$SKILL
+git worktree remove --force "$W" 2>/dev/null; rm -rf "$W"                       # a leftover path, registered or not, makes add fail
+git -C "$T" worktree add "$W" HEAD && mkdir -p "$W/$REL/.claude" && cp -R "$P/.claude/skills" "$W/$REL/.claude/"   # mkdir first: where .claude isn't at HEAD, cp would create .claude *as* the copy
+# … spawn the follow (next paragraph) with $W/$REL as its project root, then: git worktree remove --force "$W"
+```
+
+The worktree holds HEAD's code and prose plus the working tree's skills; a skill that documents uncommitted code or an uncommitted CLAUDE.md edit will fail falsely — commit first. Spawn a `general-purpose` subagent (**never `fork`** — it inherits this session's context and cannot fail the way a real reader fails; not `Explore`, which cannot write and so cannot build what it produced). Its prompt carries `$W`, the skill's path inside it, one realistic task phrased from the skill's *description* (not its steps), the rule that every path it touches is absolute and under `$W`, and the brief: do the task there using only the skill as instruction; build or run what you produced and paste the output; stop after the task or twenty tool calls; report (1) every path read or searched that the skill did not name, (2) findings classed **STALL** (could not proceed *because of the skill*), **WRONG** (quoted instruction + failing output), **GAP** (had to discover it; the skill should have said it), **NIT** (anything that changes no outcome: wording, a stall caused by the environment or the call budget), at most ten. Afterwards `git worktree remove --force "$W"` — always needed, because the copied skills are untracked; a plain `remove` that succeeds means the copy never landed. **Verdict:** any STALL or WRONG fails the skill. Each STALL is a finding at `sev:medium` — "Executed as:" is the quoted instruction and where the tester stopped — after you confirm it isn't an environment stall; each WRONG at the severity of what an executor would have shipped, default `sev:high`, verified by re-running its quoted failing command yourself; GAPs and an access list longer than five unnamed paths roll into one `sev:low` aggregate finding per skill; NITs are footnoted. Re-reading the skill is not verification — in an agent-driven project the same lineage wrote it. "Audits write no source" means the working tree: the follow's worktree and the runnable-examples scratch checkout are both discarded.
+
+**Behavioural claims.** Extract assertions of the shape *X does Y*, *when A then B*, *the system validates Z*, and read the implementing code for each. There are always more than can be checked, so prioritise in this order and say in the report where you stopped: (1) claims an open or planned story names as the method to follow — those are about to be executed; (2) claims about validation, authorization, persistence, or startup; (3) claims about code that changed after the document was last touched (`git log -1 --format=%cI -- <doc>` for the doc's last commit date — `git -C "$D" log -1 --format=%cI -- <page>` for a wiki page, since the clone is its own repo; an uncommitted document prints nothing, and `--since=""` then returns zero commits, so use today — then `git log --since=<that> -- <path>`; never the file's mtime, which git does not store and a fresh clone resets). Existence of the cited symbol is the floor, not the check: the defects this area exists for all pass an existence sweep.
+
+**Exemplars.** A document instructing "copy X" inherits X's defects. Cross-reference each named exemplar against the project's open findings — `gh issue list --state open --limit 200 --json number,title,body,labels --jq '[.[] | select((.title + .body) | contains("<exemplar symbol>"))]'`, by symbol not path (search tokenises paths) and with no label filter, since a human-filed defect may carry no `bug`/`security` label at all (and `gh` ANDs comma-separated labels, so `--label bug,security` would match only issues carrying both); an exemplar carrying a known defect with no warning is a defect generator, severity that of the defect it propagates — re-rated under the rubric when the issue carries no `sev:*` label, as human-filed ones usually don't.
+
+**Runnable examples** are checked by running them — on a disposable checkout or scratch database only. Failure modes here are destructive by nature (a documented step against a file that re-runs on every boot bricks startup for existing installs) and an audit writes no source: if an example cannot be run in isolation safely, report it as unverified rather than running it.
+
+**Coverage.** The inverse half is the fourth sweep: every cited path that no longer exists. The forward half — live features no document names — takes the Integration area's enumeration (routes and UI entry points from the filesystem); on a docs-only run say that half was skipped.
+
+**Severity.** Read the rubric's "today" as *when this document is next followed* — a document is a latent instruction, so one that would lead an executor to write an authorization defect carries that defect's severity, not `sev:low`. Rot with no behavioural consequence — a drifted line number beside a symbol that still resolves, a renamed path an executor would find on the first grep — is `sev:low`; a stale path that would send an executor to the wrong file is "actively misleading" and `sev:high`, and drifted citations are reported as **one aggregate finding per document** rather than one per citation, or they consume the punch-list cap on their own.
+
+**Expect code defects too.** Checking whether a document's claims are true surfaces bugs the code audits miss — a revocation that stops running after first boot, a published event with no stream provisioned. File them in their own area, not folded into a documentation fix.
 
 ## Integration (wiring audit)
 

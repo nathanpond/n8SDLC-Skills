@@ -87,12 +87,12 @@ Encode ordering with dependencies, **not prose** — execution follows the graph
 - **M0 is always infrastructure setup** (deployment targets, environments, project plumbing).
 - **CI comes early** — usually M1 or folded into M0 — covering dev/stage/production deployment via GitHub Actions unless the user chose otherwise.
 - **Audit is always last**, holding audit passes and approved audit-finding fixes.
-- The milestone description records: goal, ordered phases, and definition of done. Definition of done always includes: all issues closed, all automated tests written and passing, and `/n8-verify` passed.
+- The milestone description records: goal, ordered phases, the `coverage-claim` fenced block where the milestone delivers part of a totalising claim (shape defined in `/n8-roadmap`; `/n8-plan` appends the map and `## Coverage check` beneath it), and definition of done. Definition of done always includes: all issues closed, all automated tests written and passing, and `/n8-verify` passed.
 - A milestone is **closed only by /n8-verify** (verification is part of done). `/n8-exec` never closes milestones.
 
 ```bash
 gh api repos/$R/milestones --jq '.[].title'    # list (add -f state=all to include closed)
-gh api -X POST repos/$R/milestones -f title="M1: Core API" -f description="..."
+gh api -X POST repos/$R/milestones -f title="M1: Core API" -F description=@"$SCRATCH/m1.md"   # -F @file, never -f "…": inline quoting mangles the fenced block
 ```
 
 ## Duplicate check — before creating ANY issue
@@ -129,7 +129,7 @@ This is what makes a repeated audit produce deltas instead of duplicates.
 
 ## Working discipline (execution)
 
-Hard-won rules — each exists because the naive behavior failed in practice:
+Hard-won rules — each exists because the naive behavior failed in practice. Three of them (`Refs` vs `Fixes`, checking issue state after a merge, closing with evidence) are special cases of the general law in `${CLAUDE_PLUGIN_ROOT}/reference/verification.md` — **verify the effect, not the report** — which covers the same failure shape for every operation not listed here. Read it alongside this section.
 
 - **Comment the plan before the code.** Before implementing an issue, comment 2–5 bullets on it: the approach and files you expect to touch. If the issue lacks acceptance criteria, derive them and put them in this comment as a checklist — the definition of done gets written down before the work starts.
 - **`Refs #N` in commits, never `Fixes #N`/`Closes #N`.** Auto-closing keywords only fire on the default branch; on a feature/milestone branch they silently do nothing, so they train false confidence. Closing is done deliberately (PR body, or an explicit close with evidence).
@@ -221,17 +221,23 @@ The **Must-haves** block is derived goal-backward at plan time and cashed by `/n
 - Commit per story on that branch; reference the story in the commit body as `Refs #N` (and optionally the subject: `feat: user login (#12)`). Never closing keywords in commits — see Working discipline.
 - One PR per milestone. The PR body lists `Closes #N` for every **completed** story **and completed subtask** (subtasks close with their parent story's PR — otherwise they dangle open under a closed parent); the PR merges to the default branch, so these fire correctly. Never list partially done issues. Merge only when CI is green (once CI exists), then run the post-merge state check on every story that was touched but not finished.
 
-**Waiting on CI** (autonomous runs): `gh pr checks --watch --interval 15` for the simple case. The polling form has two races to defeat: zero checks registered yet ("none pending" is trivially true), and — after pushing a new commit — the loop seeing the *previous* SHA's completed checks and exiting early. So: sleep first, then require at least one check:
+**Waiting on CI** (autonomous runs). `--watch` blocks the whole tool call and never returns "still pending", so poll. Two races to defeat: zero checks registered yet ("none pending" is trivially true), and — after pushing a new commit — seeing the *previous* SHA's completed checks. So sleep first, require at least one check, and keep each call under the Bash tool's two-minute default — this loop is ~96 s worst case including seven `gh` calls; one call is one *tick*, `/n8-exec` counts ticks, and the two printed timestamps corroborate the clock:
 
 ```bash
-sleep 20   # let checks for the just-pushed SHA register
-until gh pr checks --json name,bucket 2>/dev/null \
-      | jq -e 'length > 0 and all(.bucket != "pending")' >/dev/null; do sleep 15; done
+date -u +%H:%M:%S   # printed first and last: a call killed by the timeout shows only the first
+sleep 20
+for i in 1 2 3 4 5 6; do
+  gh pr checks 41 --json name,bucket | jq -e 'length > 0 and all(.bucket != "pending")' >/dev/null && break
+  sleep 12
+done
+gh pr checks 41 --json bucket --jq '[.[].bucket] | unique'; date -u +%H:%M:%S
 ```
 
-Habitually truncate `gh` output (`| tail -2`, `--jq` projections) — long runs die by context, not by errors. But **never pipe a command whose success gates a close** (`git push 2>&1 | tail -1` eats the exit status and reports failure as success) — run it bare, or `set -o pipefail` first.
+The last line is the verdict, read as a set, never as an exit code (with `--json`, `gh` exits 0 on a red check; without it, 1 — and 1 for a typo'd PR number): `["pass"]` or with `"skipping"` → green; any `"fail"` → red; any `"pending"` → not yet; any `"cancel"` → re-run the workflow, don't "fix"; `[]` or `no checks reported` → nothing registered. The `| jq -e` inside the loop is the intended gate — jq's status *is* the signal — which is why this pipe is fine where `git push | tail` is not. Never add `2>/dev/null`: an auth or network error must be visible on the first tick, not after the budget.
 
-**Non-TTY note:** `gh issue view <n> --comments` can print nothing outside a TTY. In autonomous runs, read issues with `--json title,body,comments`.
+Keep `gh` output short in context (`--jq` projections, `--json` with only the fields needed) — long runs die by context, not by errors — but never *discard* output a later step might need: capture to a file first, then trim what you read (`/n8-exec` has the form). **Never pipe a command whose success gates a close** (`git push 2>&1 | tail -1` returns `tail`'s status and reports failure as success) — run it bare, or `set -o pipefail` in the same invocation.
+
+**Non-TTY note:** `gh issue view <n> --comments` printed nothing outside a TTY on gh 2.6x–2.7x; current versions print. `--json title,body,comments` is reliable on all of them. In autonomous runs, read issues with `--json title,body,comments`.
 
 **Ticking AC checkboxes** on an issue:
 

@@ -23,7 +23,7 @@ Open and close with the one thing the user should remember:
 | `/n8-exec M1` | Executes planned milestones autonomously (`M1,M2`, `*`): milestone branch + PR, tests passing, decisions logged, blockers marked and skipped. |
 | `/n8-verify` | Verifies executed milestones against acceptance criteria (`--auto` agent-verifies; `--testplan` walks you through UAT). Passing verify is what closes a milestone. |
 | `/n8-release` | Tags a verified commit on main, creates the GitHub release, and watches whatever the tag triggers (prod deploy, publish). Never runs unasked. |
-| `/n8-audit` | Audit suite: security, authorization, stability, performance, cleanup, 508, tests, integration. Findings are verified, severity-rated, and filed on your approval. |
+| `/n8-audit` | Audit suite: security, authorization, stability, performance, cleanup, 508, tests, integration, docs (skills/wiki/CLAUDE.md checked against the code). Findings are verified, severity-rated, and filed on your approval. |
 | `/n8-wiki` | Reconciles the whole wiki against the backlog and codebase. Honest tone; applies updates, then summarizes. |
 | `/n8-stat` | **Where you are and what's next** — derived live from GitHub, with anything needing your attention (blockers, drift, failures) surfaced inline. |
 | `/n8-file` | Quick capture: files a bug/task as a triaged-later issue in under a minute, without losing your place. |
@@ -31,5 +31,7 @@ Open and close with the one thing the user should remember:
 | `/n8-skill` | Builds a project-specific skill into this repo's `.claude/skills/` (also suggested by planning when a pattern warrants one). |
 | `/n8-help` | This reference. |
 | `/n8-feedback` | Report a plugin defect/gap upstream — fully previewed, nothing sent without approval. |
+
+Background reading: `${CLAUDE_PLUGIN_ROOT}/reference/verification.md` — why the gates in plan, exec, verify, audit and skill are shaped the way they are (a check is only evidence if it could have failed).
 
 Keep the summaries to this table's altitude — the commands' own skills carry the detail. If the user asks "which one do I run now?", don't guess from the table: run the `/n8-stat` logic and answer from the project's actual state.
