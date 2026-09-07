@@ -68,4 +68,8 @@ A milestone passes when: every AC is verified (agent-verified or user-approved m
 
 When a closed milestone represents shippable value (feature milestones especially, and always the final one), **suggest `/n8-release`** — it handles version selection, tagging the verified commit on main, generated notes, and whatever the tag triggers (production deploy, publish). Never release unasked; the suggestion is the offer.
 
-Report per milestone: verified AC count, evidence highlights, manual steps awaiting the user (if any), bugs filed, closed or still open and why — honestly; a milestone that limps through is reported as such. Suggest the next step: fix pass, remaining verifications, next `/n8-exec`, or `/n8-audit` if all feature milestones are done.
+Report per milestone: verified AC count, evidence highlights, manual steps awaiting the user (if any), bugs filed, closed or still open and why — honestly; a milestone that limps through is reported as such. Pick the single next step — a fix pass (`/n8-exec` on the milestone with filed bugs), remaining verifications, `/n8-release` when the closed milestone is shippable, the next `/n8-exec`, or `/n8-audit` if all feature milestones are done — and end:
+
+> ➡ Next: /n8-exec M2
+
+**End on the Next line.** The reply's final line is `➡ Next: /n8-exec M2` (an example — substitute the real command and arguments): one recommended command, alone on the line, nothing after it. The why and any alternatives go in the sentence above it, never appended to it. Claude Code's prompt suggestion reads the transcript; a bare, final, unambiguous command is what lets the user accept it with Tab.

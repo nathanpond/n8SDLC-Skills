@@ -38,8 +38,11 @@ Stage: <stage>
 
 ⚠ Attention: <blocked issues with their questions; failed verifications; unmerged milestone PRs; open confirmed bugs; suspected plan drift; needs-triage pile-up (>5 untriaged captures)>
 
-➡ Next: /n8-<command> — <one line on why>
+<one line on why the next command is the right one>
+➡ Next: /n8-<command> <args>
 ```
+
+**End on the Next line.** The reply's final line is `➡ Next: /n8-exec M1` (an example — substitute the real command and arguments): one recommended command, alone on the line, nothing after it. The why and any alternatives go in the sentence above it, never appended to it. Claude Code's prompt suggestion reads the transcript; a bare, final, unambiguous command is what lets the user accept it with Tab.
 
 The Attention section only appears when something needs the user. Blocked issues show their actual question inline — the user should be able to unblock straight from this readout without clicking through. List `needs-owner-action` issues first: those are, by definition, waiting on exactly the person reading this.
 

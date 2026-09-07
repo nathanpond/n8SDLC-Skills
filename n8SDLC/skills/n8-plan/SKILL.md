@@ -85,6 +85,8 @@ Log notable planning decisions to `.n8/decisions.md`.
 
 Land any local state edits (`.n8/decisions.md`, CLAUDE.md invariant markings) per `reference/state.md`'s "Committing state changes" — the main ruleset blocks direct pushes.
 
-Per milestone: story count, subtask count, dependency chains, test coverage summary. Then the analysis outcomes (audit emphases, suggested skills). Finish with the next step — more planning if milestones remain unplanned, otherwise:
+Per milestone: story count, subtask count, dependency chains, test coverage summary. Then the analysis outcomes (audit emphases, suggested skills). Finish with the next step — `/n8-plan <next unplanned>` if milestones remain unplanned, otherwise execution of the lowest planned-but-unexecuted milestone (mention `/n8-exec *` in the sentence above as the run-everything alternative):
 
-> Next: run `/n8-exec M<lowest planned-but-unexecuted>` to execute (or `/n8-exec *` to run everything autonomously).
+> ➡ Next: /n8-exec M1
+
+**End on the Next line.** The reply's final line is `➡ Next: /n8-exec M1` (an example — substitute the real command and arguments): one recommended command, alone on the line, nothing after it. The why and any alternatives go in the sentence above it, never appended to it. Claude Code's prompt suggestion reads the transcript; a bare, final, unambiguous command is what lets the user accept it with Tab.

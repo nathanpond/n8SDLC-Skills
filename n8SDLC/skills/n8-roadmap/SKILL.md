@@ -60,6 +60,8 @@ Every milestone description carries: goal; ordered phases (the epics' work in th
 
 Append a `## /n8-roadmap — <date>` section to `.n8/decisions.md` naming the choices made (spec version, tiers, ordering, what was deferred), then land the run's state edits (`.n8/`, CLAUDE.md) per `reference/state.md`'s "Committing state changes" — a `n8/roadmap-state` branch and PR, since the ruleset blocks direct pushes to main.
 
-Summarize: the epic list (numbers + titles), the milestone sequence with one-line goals, the recorded deployment/CI answers, and any open questions deferred to milestone planning. Finish with:
+Summarize: the epic list (numbers + titles), the milestone sequence with one-line goals, the recorded deployment/CI answers, and any open questions deferred to milestone planning. Say that the infrastructure milestone is planned first (and that `/n8-plan *` plans everything), then end:
 
-> Next: run `/n8-plan M0` to plan the infrastructure milestone in detail (or `/n8-plan *` to plan everything).
+> ➡ Next: /n8-plan M0
+
+**End on the Next line.** The reply's final line is `➡ Next: /n8-plan M0` (an example — substitute the real command and arguments): one recommended command, alone on the line, nothing after it. The why and any alternatives go in the sentence above it, never appended to it. Claude Code's prompt suggestion reads the transcript; a bare, final, unambiguous command is what lets the user accept it with Tab.

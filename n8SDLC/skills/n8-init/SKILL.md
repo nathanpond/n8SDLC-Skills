@@ -130,6 +130,8 @@ Seed `decisions.md`'s header with the ad-hoc entry format from `reference/state.
 
 ## 9. Commit, push, report
 
-Commit everything (`chore: initialize project via n8-init`) and push `main`. Then report a checklist of what was set up, what was skipped and why (honestly — e.g. "secret scanning unavailable on private repos"), and finish with the next step:
+Commit everything (`chore: initialize project via n8-init`) and push `main`. Then report a checklist of what was set up, what was skipped and why (honestly — e.g. "secret scanning unavailable on private repos"), and finish with the next step — tell the user the roadmap command is where they describe the overall goal of the app, its expected features, and acceptance criteria — then:
 
-> Next: run `/n8-roadmap` and describe the overall goal of the app, its expected features, and acceptance criteria.
+> ➡ Next: /n8-roadmap
+
+**End on the Next line.** The reply's final line is `➡ Next: /n8-roadmap` (an example — substitute the real command and arguments): one recommended command, alone on the line, nothing after it. The why and any alternatives go in the sentence above it, never appended to it. Claude Code's prompt suggestion reads the transcript; a bare, final, unambiguous command is what lets the user accept it with Tab.

@@ -113,4 +113,8 @@ After all targeted milestones:
 - Per milestone: stories completed, PR link, test results (real numbers — if anything is failing or skipped, say so plainly).
 - **Every decision made during execution**, from the decision log, displayed in full.
 - Every blocker with its question and options, and which stories it holds up.
-- Next step: `/n8-verify <targets>` — or, if blockers exist, answer them (comment on the issues or reply here) and re-run `/n8-exec` for the affected milestones.
+- Next step: verification of the executed targets — or, if blockers exist, say so and ask the user to answer them (comment on the issues or reply here), in which case the Next line is `/n8-exec` for the affected milestones instead.
+
+> ➡ Next: /n8-verify M1
+
+**End on the Next line.** The reply's final line is `➡ Next: /n8-verify M1` (an example — substitute the real command and arguments): one recommended command, alone on the line, nothing after it. The why and any alternatives go in the sentence above it, never appended to it. Claude Code's prompt suggestion reads the transcript; a bare, final, unambiguous command is what lets the user accept it with Tab.

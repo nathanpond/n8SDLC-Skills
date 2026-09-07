@@ -41,4 +41,8 @@ If a tag-triggered workflow exists (prod deploy, publish), watch it to completio
 
 - Log the release to `.n8/decisions.md` (version, SHA, milestones included, what was triggered).
 - If the wiki is enabled, update Home's project-status section (honestly: "v1.2.0 shipped — covers M3–M4; M5 in progress"). A full reconcile stays `/n8-wiki`'s job.
-- Report: release URL, notes summary, deploy/publish outcomes with real statuses, and the next step from `/n8-stat`'s logic.
+- Report: release URL, notes summary, deploy/publish outcomes with real statuses, and the next step from `/n8-stat`'s stage derivation, ending:
+
+  > ➡ Next: /n8-exec M5
+
+  **End on the Next line.** The reply's final line is `➡ Next: /n8-exec M5` (an example — substitute the real command and arguments): one recommended command, alone on the line, nothing after it. The why and any alternatives go in the sentence above it, never appended to it. Claude Code's prompt suggestion reads the transcript; a bare, final, unambiguous command is what lets the user accept it with Tab.

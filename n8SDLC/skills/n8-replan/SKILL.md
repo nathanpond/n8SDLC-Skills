@@ -38,4 +38,8 @@ Leave an audit trail: comment on every modified issue ("Replanned 2026-08-27: au
 
 ## 5. Report
 
-Issues updated / created / closed per milestone, epic AC flags, ledger entries reconciled, and anything found that suggests deeper drift than the scope covered (recommend widening). Next step: usually `/n8-exec <next milestone>` — the plan is trustworthy again.
+Issues updated / created / closed per milestone, epic AC flags, ledger entries reconciled, and anything found that suggests deeper drift than the scope covered (recommend widening — then the Next line is `/n8-replan` with the wider scope). Otherwise the plan is trustworthy again and the next step is executing the next milestone:
+
+> ➡ Next: /n8-exec M4
+
+**End on the Next line.** The reply's final line is `➡ Next: /n8-exec M4` (an example — substitute the real command and arguments): one recommended command, alone on the line, nothing after it. The why and any alternatives go in the sentence above it, never appended to it. Claude Code's prompt suggestion reads the transcript; a bare, final, unambiguous command is what lets the user accept it with Tab.
