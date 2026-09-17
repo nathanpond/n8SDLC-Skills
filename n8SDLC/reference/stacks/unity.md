@@ -16,7 +16,7 @@ Unity projects are created from the Unity Hub/editor, not the CLI — if no proj
 - C# quality: same analyzers as the .NET stack where applicable
 
 ## CI (GitHub Actions)
-Use GameCI (`game-ci/unity-test-runner`, `game-ci/unity-builder`). Requires a `UNITY_LICENSE` secret — walk the user through GameCI activation; CI is not fully autonomous for Unity until that secret exists. Cache `Library/`.
+Use GameCI (`game-ci/unity-test-runner`, `game-ci/unity-builder`). Requires a `UNITY_LICENSE` secret — walk the user through GameCI activation; CI is not fully autonomous for Unity until that secret exists. Cache `Library/`. Both actions download the game-ci CLI at job start through their `cliVersion:` input, whose default is `latest` — set it to an exact release tag (`gh api repos/game-ci/cli/releases/latest --jq .tag_name`); left floating, one upstream release published without assets fails every job before Unity starts, with nothing local changed. Action majors likewise: resolve, then pin (`reference/github.md` → *GitHub Actions lessons*).
 
 ## Audit tooling
 - Dependencies: review `Packages/manifest.json` pins; Dependabot has no Unity support — note this honestly in audits

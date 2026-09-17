@@ -73,7 +73,7 @@ Touch nothing outside n8SDLC's domains — a project's unrelated skills, hooks, 
 
 Check visibility. **Ordering: on a brand-new repo, run step 9's initial commit + push before this step's CodeQL and ruleset bullets** — CodeQL default setup no-ops on an empty repo, and a PR-required ruleset on `main` would block init's own direct push. For **public** repos, enable and verify:
 
-- Dependabot alerts + security updates: `gh api -X PUT repos/$R/vulnerability-alerts` and `gh api -X PUT repos/$R/automated-security-fixes`; write a stack-appropriate `.github/dependabot.yml`.
+- Dependabot alerts + security updates: `gh api -X PUT repos/$R/vulnerability-alerts` and `gh api -X PUT repos/$R/automated-security-fixes`; write `.github/dependabot.yml` listing the `github-actions` ecosystem (weekly) plus the stack's package ecosystem where one exists — action majors written during the CI milestone go stale otherwise, and the bot's PRs are the catch.
 - CodeQL default setup (after code is pushed): `gh api -X PATCH repos/$R/code-scanning/default-setup -f state=configured --silent` (fall back to committing a CodeQL workflow if default setup isn't available for the language).
 - Secret scanning + push protection: `gh api -X PATCH repos/$R --silent -f 'security_and_analysis[secret_scanning][status]=enabled' -f 'security_and_analysis[secret_scanning_push_protection][status]=enabled'`.
 - Branch ruleset on `main` (after the initial push): PR required before merge, approval count 0 for a solo author (anything higher deadlocks the milestone-PR flow). The check requirement gets added by the CI milestone once CI exists.

@@ -16,7 +16,7 @@ Ask which platforms matter (affects CI matrix and audit scope). Ask state-manage
 - Lint/format: `dart analyze` and `dart format --set-exit-if-changed .`; `flutter_lints`/`very_good_analysis` in `analysis_options.yaml`
 
 ## CI (GitHub Actions)
-`subosito/flutter-action` → `flutter pub get` → `dart analyze` → format check → `flutter test` → platform builds (`flutter build apk|ios|web`). iOS builds need macOS runners and signing secrets — ask before assuming. Deploy per roadmap answers (stores via fastlane, web hosting, etc.).
+`subosito/flutter-action` → `flutter pub get` → `dart analyze` → format check → `flutter test` → platform builds (`flutter build apk|ios|web`). iOS builds need macOS runners and signing secrets — ask before assuming. Deploy per roadmap answers (stores via fastlane, web hosting, etc.). Action versions: resolve, then pin (`reference/github.md` → *GitHub Actions lessons*).
 
 ## Audit tooling
 - Dependencies: `flutter pub outdated`, `dart pub audit` (advisories), Dependabot (pub support)

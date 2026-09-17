@@ -19,7 +19,7 @@ Ask which shape: CLI, API service (FastAPI default), library, data/script projec
 - Types: `uv run mypy .` (strictness per user preference)
 
 ## CI (GitHub Actions)
-`astral-sh/setup-uv` → `uv sync` → ruff → mypy → pytest. Deploy per roadmap answers.
+`astral-sh/setup-uv` → `uv sync` → ruff → mypy → pytest. Deploy per roadmap answers. Action versions: resolve, then pin (`reference/github.md` → *GitHub Actions lessons*).
 
 ## Audit tooling
 - Dependencies: `pip-audit` (or `uv run pip-audit`), Dependabot

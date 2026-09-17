@@ -21,7 +21,7 @@ Ask npm vs pnpm; default npm unless a lockfile says otherwise. Add Vitest for un
 - Lint/format: ESLint + Prettier; typecheck with `npx tsc --noEmit`
 
 ## CI (GitHub Actions)
-`actions/setup-node` (cache npm) → install → `tsc --noEmit` → lint → unit tests → build → e2e (Playwright container) if present. Deploy per roadmap answers (Vercel, Cloudflare, containers, etc.).
+`actions/setup-node` (cache npm) → install → `tsc --noEmit` → lint → unit tests → build → e2e (Playwright container) if present. Deploy per roadmap answers (Vercel, Cloudflare, containers, etc.). Action versions: resolve, then pin (`reference/github.md` → *GitHub Actions lessons*).
 
 ## Audit tooling
 - Dependencies: `npm audit`, Dependabot

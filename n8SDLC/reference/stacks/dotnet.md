@@ -21,7 +21,7 @@ Pin the SDK with `global.json` (`dotnet --version` to get the installed one). As
 - Format/lint: `dotnet format --verify-no-changes`; enable `<TreatWarningsAsErrors>` and .NET analyzers in a `Directory.Build.props`.
 
 ## CI (GitHub Actions)
-`actions/setup-dotnet` → `dotnet restore` → `dotnet build --no-restore -warnaserror` → `dotnet test --no-build`. Deploy jobs depend on the roadmap's deployment answers (Azure App Service, containers, etc.).
+`actions/setup-dotnet` → `dotnet restore` → `dotnet build --no-restore -warnaserror` → `dotnet test --no-build`. Deploy jobs depend on the roadmap's deployment answers (Azure App Service, containers, etc.). Action versions: resolve, then pin (`reference/github.md` → *GitHub Actions lessons*).
 
 ## Audit tooling
 - Dependencies: `dotnet list package --vulnerable --include-transitive`
