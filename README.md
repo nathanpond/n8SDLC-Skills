@@ -13,7 +13,7 @@ Two convictions drive the design:
 
 ## Core features
 
-- **Full lifecycle in 16 commands** — init, brownfield mapping, roadmap, granular planning, drift repair, autonomous execution, adversarial verification, releases, an 8-dimension audit suite, wiki upkeep, status, quick capture, persistent debugging, project-skill building, help, and an upstream feedback loop (`/n8-feedback`: skill learnings from any project flow back to the plugin as sanitized, user-approved issues).
+- **Full lifecycle in 18 commands** — init, brownfield mapping, roadmap, granular planning, drift repair, autonomous execution, adversarial verification, releases, an 8-dimension audit suite, wiki upkeep, status, quick capture, persistent debugging, project-skill building, help, background-work inventory, project upgrades, and an upstream feedback loop (`/n8-feedback`: skill learnings from any project flow back to the plugin as sanitized, user-approved issues).
 - **Autonomous execution that finishes** — milestone branches with one PR each, dependency-ordered stories, tests written and passing as part of every story, a deviation rulebook for discovered work (fix bugs and missing correctness automatically; stop only for architectural forks), and blockers that get labeled and skipped, never stalled on.
 - **Structural verification** — every story carries a goal-backward "must-haves" contract (truths → artifacts → key links) that verification cashes with an exists/substantive/wired check; snapshots regenerated to make tests pass are treated as claims, not results. Verification closes milestones; nothing else does.
 - **Drift detection and repair** — ad-hoc changes made in any session get captured to a ledger (via a CLAUDE.md instruction installed at init), surfaced by status and execution preflight, and repaired by `/n8-replan` using three evidence sources: the ledger, git history, and the codebase itself.
@@ -46,6 +46,8 @@ claude plugin install n8sdlc@n8sdlc-skills
 ```
 
 Claude Code will prompt to trust the marketplace on first use.
+
+**Updating.** `claude plugin update n8sdlc@n8sdlc-skills` (or `/plugin`), then restart the session. A plugin update changes the commands at once, but not what `/n8-init` wrote into your projects. The next session in each n8SDLC project notices the version gap and suggests `/n8-upgrade`, which shows what's new and brings that project's setup current on your approval.
 
 ## Getting started
 
@@ -84,6 +86,8 @@ Claude Code will prompt to trust the marketplace on first use.
 | `/n8-debug` | Systematic debugging with a GitHub issue as the persistent investigation brain. |
 | `/n8-skill` | Build a project-specific skill into the repo's `.claude/skills/`. |
 | `/n8-help` | This table, live, annotated with your project's current state. |
+| `/n8-subs` | Everything running in the background (subagents, shells, monitors, schedules), with runtime, expected finish, and what's overdue or orphaned. |
+| `/n8-upgrade` | After a plugin update: what's new, and this project's setup brought up to the installed version. |
 | `/n8-feedback` | Feed a plugin learning back upstream — sanitized of project specifics, previewed in full, sent only on your approval. |
 
 ## How the workflow works

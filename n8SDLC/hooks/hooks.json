@@ -1,0 +1,17 @@
+{
+  "description": "n8SDLC: at session start in an n8SDLC project, suggest /n8-upgrade when the project's recorded plugin version differs from the installed plugin",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh", "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/version-check.sh"],
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

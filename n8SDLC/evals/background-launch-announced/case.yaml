@@ -1,0 +1,33 @@
+schema_version: "1.1"
+name: background-launch-announced
+description: >
+  0.7.0 background-work discipline: in an n8SDLC project, a background launch comes with a line
+  saying what it is, when it should finish and how it ends, and the reply names it if still running.
+tags: [v0.7, background]
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: >
+    Kick off `npm test` in the background (it's slow), and while it runs tell me what src/index.ts
+    exports. Don't wait for the tests before answering.
+  allowed_tools: [Bash, Read, Glob, Grep, Skill]
+  max_turns: 20
+  timeout_seconds: 300
+graders:
+  - name: used-run-in-background
+    type: tool_used
+    tool: Bash
+    input_match: '"run_in_background"\s*:\s*true'
+  - name: no-ampersand-background
+    type: tool_used
+    tool: Bash
+    input_match: 'npm test[^"]*&\s*("|$)|nohup'
+    min: 0
+    max: 0
+  - name: announced
+    type: llm
+    criteria: >
+      When launching the test run, the response states what it is, an expected duration (or an
+      explicit "unknown" with a check-in plan), and what ends it. Before the final message ends,
+      if the tests are still running, the reply says so and whether a notification will arrive.
+      It also answers the question about src/index.ts (it exports an `add` function).

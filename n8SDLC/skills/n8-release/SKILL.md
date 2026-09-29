@@ -35,7 +35,7 @@ Notes generate from merged PR titles (which carry their issue numbers — that's
 
 ## 4. Watch what the tag set in motion
 
-If a tag-triggered workflow exists (prod deploy, publish), watch it to completion (`gh run watch`). A release whose deploy failed is not shipped — report the failure plainly, and don't delete the tag to cover it; fix forward or let the user decide.
+If a tag-triggered workflow exists (prod deploy, publish), watch it to completion. Don't use a bare `gh run watch`: it blocks the tool call with no deadline, and a stuck deploy hangs the session. Poll `gh run view <id> --json status,conclusion` in ticks, the way `reference/github.md` → *Waiting on CI* does, with a budget of the workflow's last successful duration × 2 (from `gh run list --workflow <f> --status success --limit 1 --json createdAt,updatedAt`). Past that budget, report it as overdue with the run's link rather than waiting on. A release whose deploy failed is not shipped — report the failure plainly, and don't delete the tag to cover it; fix forward or let the user decide.
 
 ## 5. Record and report
 

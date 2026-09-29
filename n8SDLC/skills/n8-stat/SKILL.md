@@ -36,7 +36,7 @@ Stage: <stage>
 | M0: Infrastructure | ✅ | ✅ | ✅ closed | |
 | M1: Core API | ✅ 8 stories | 🔶 6/8 | — | 2 blocked |
 
-⚠ Attention: <blocked issues with their questions; failed verifications; unmerged milestone PRs; open confirmed bugs; suspected plan drift; needs-triage pile-up (>5 untriaged captures); open Dependabot PRs (count and oldest age — `gh pr list --author app/dependabot --state open --json number,createdAt`)>
+⚠ Attention: <`plugin_version:` in `.n8/config.yml` absent or behind the installed plugin's version → "project setup is behind n8SDLC <v>, run `/n8-upgrade`"; blocked issues with their questions; failed verifications; unmerged milestone PRs; open confirmed bugs; suspected plan drift; needs-triage pile-up (>5 untriaged captures); open Dependabot PRs (count and oldest age — `gh pr list --author app/dependabot --state open --json number,createdAt`)>
 
 <one line on why the next command is the right one>
 ➡ Next: /n8-<command> <args>

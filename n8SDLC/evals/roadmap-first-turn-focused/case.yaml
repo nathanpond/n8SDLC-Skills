@@ -1,0 +1,39 @@
+schema_version: "1.1"
+name: roadmap-first-turn-focused
+description: >
+  0.7.0 (#10, #9) /n8-roadmap asks one focused batch per turn (at most four questions, one topic),
+  never a restatement with bundled defaults; "every saved item" (runtime data) gets no
+  coverage/tier question. GitHub is unreachable in evals, so this grades the first turn only.
+tags: [v0.7, n8-roadmap]
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: >
+    /n8-roadmap tallyho should get a `stats` command that summarises every saved tally, and an
+    `export --format json|csv` command. Success: I can script reports. Out of scope: any GUI.
+  allowed_tools: [Bash, Read, Glob, Grep, Skill, AskUserQuestion]
+  max_turns: 30
+  timeout_seconds: 600
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?n8-roadmap"'
+    arm: with-only
+  - name: nothing-created
+    type: tool_used
+    tool: Bash
+    input_match: 'gh (issue|label|release) create|gh api [^"]*-X (POST|PATCH|PUT)|gh api [^"]*--method (POST|PATCH|PUT)'
+    min: 0
+    max: 0
+  - name: no-coverage-question-for-runtime-data
+    type: regex
+    pattern: '(?i)enumerable|which tier|coverage-claim'
+    match: not_contains
+  - name: focused-batch
+    type: llm
+    criteria: >
+      The final message is a question turn, not a roadmap restatement: it asks at most four
+      questions, all on one topic (e.g. who uses it and what success looks like), and does not
+      present drafted epics or a milestone sequence for approval. It does not bundle proposed
+      defaults on several different topics for a single OK.

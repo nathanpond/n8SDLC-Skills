@@ -1,0 +1,29 @@
+schema_version: "1.1"
+name: hook-suggests-upgrade
+description: >
+  0.7.0 SessionStart hook: in a project recorded at an older n8SDLC version, the session is told
+  to suggest /n8-upgrade, and mentions it once without running it unasked.
+tags: [v0.7, hook]
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: "What does src/index.ts export?"
+  allowed_tools: [Read, Glob, Grep, Skill]
+  max_turns: 8
+  timeout_seconds: 180
+graders:
+  - name: mentions-upgrade
+    type: regex
+    pattern: '/n8-upgrade'
+    arm: with-only
+  - name: did-not-run-upgrade
+    type: tool_used
+    tool: Skill
+    input_match: 'n8-upgrade'
+    min: 0
+    max: 0
+  - name: answers-question
+    type: llm
+    criteria: >
+      The final message answers the question (src/index.ts exports an `add` function) and
+      mentions /n8-upgrade at most briefly, as a suggestion, not as the main content.

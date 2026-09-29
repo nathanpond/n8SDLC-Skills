@@ -1,0 +1,28 @@
+schema_version: "1.1"
+name: upgrade-current-is-noop
+description: 0.7.0 /n8-upgrade on a project already current makes no edits and says so briefly.
+tags: [v0.7, n8-upgrade]
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: "/n8-upgrade"
+  allowed_tools: [Bash, Read, Glob, Grep, Edit, Write, Skill]
+  max_turns: 30
+  timeout_seconds: 600
+graders:
+  - name: no-file-edits
+    type: tool_used
+    tool: Edit
+    min: 0
+    max: 0
+  - name: no-file-writes
+    type: tool_used
+    tool: Write
+    min: 0
+    max: 0
+  - name: says-current
+    type: llm
+    criteria: >
+      The final message tells the user the project's n8SDLC setup is already current (or that
+      nothing needs changing), without proposing edits to CLAUDE.md, config or dependabot.yml.
+      Mentioning that GitHub couldn't be reached (labels, release notes) is fine.

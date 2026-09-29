@@ -16,7 +16,7 @@ Open and close with the one thing the user should remember:
 | Command | What it does |
 |---|---|
 | `/n8-init` | First command. Sets up the project: shell scaffold, git + your GitHub remote, labels, templates, wiki, security features — and reconciles any pre-existing homegrown workflow. |
-| `/n8-map` | (Existing codebases) Maps stack, architecture, conventions, and concerns into the wiki before planning; concerns become issues. |
+| `/n8-map` | (Existing codebases) Maps stack, architecture, conventions, and concerns into the wiki before planning; concerns become issues. Checks existing CI/deploy with evidence, so the roadmap skips M0 and CI or keeps only the gaps. |
 | `/n8-roadmap` | You describe the goal and features; it builds epics and the milestone skeleton (M0 infrastructure → CI → features → Audit). |
 | `/n8-plan M1` | Plans milestones in granular detail (`M1,M2`, `*`) — stories, subtasks, tests, dependencies — so execution never has to ask. |
 | `/n8-replan` | Reconciles stale plans after ad-hoc changes (evidence: decision ledger, git history, codebase); proposes updates, applies on approval. |
@@ -29,6 +29,8 @@ Open and close with the one thing the user should remember:
 | `/n8-file` | Quick capture: files a bug/task as a triaged-later issue in under a minute, without losing your place. |
 | `/n8-debug` | Systematic debugging with a GitHub issue as the persistent brain — hypotheses, evidence, and eliminated dead ends survive context resets. |
 | `/n8-skill` | Builds a project-specific skill into this repo's `.claude/skills/` (also suggested by planning when a pattern warrants one). |
+| `/n8-upgrade` | After a plugin update: shows what's new and brings this project's setup (CLAUDE.md block, config, dependabot, labels, memories) up to the installed version, on your approval. |
+| `/n8-subs` | Everything running in the background — subagents, shells, monitors, schedules — with runtime, expected finish, and what's overdue, silent, or orphaned. Offers to stop the stale ones. |
 | `/n8-help` | This reference. |
 | `/n8-feedback` | Report a plugin defect/gap upstream — fully previewed, nothing sent without approval. |
 

@@ -110,7 +110,7 @@ Record `context7: installed` or `declined` in config. Proceed either way.
 
 ## 8. Local state
 
-Create `.n8/` per `reference/state.md`: `config.yml` (stack, wiki choice, repo, visibility, context7), an empty `decisions.md` with a header, and `memory/.gitkeep`.
+Create `.n8/` per `reference/state.md`: `config.yml` (stack, wiki choice, repo, visibility, context7, and `plugin_version:` set to `version` from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json`, which `/n8-upgrade` and the session-start version check read), an empty `decisions.md` with a header, and `memory/.gitkeep`.
 
 ## 8b. Ad-hoc change capture (CLAUDE.md)
 
@@ -122,6 +122,8 @@ Plans go stale when changes happen outside the n8SDLC commands — an ad-hoc con
 This project is managed by the n8SDLC workflow (GitHub Issues = the plan; `/n8-stat` shows where things stand). If a change made in this session deviates from what planned issues assume — different library, provider, architecture, dropped/added scope, or amending a declared invariant below — do two things before finishing:
 1. Append an `## Ad-hoc` entry to `.n8/decisions.md` (format documented in that file's header) naming the change, the why, and the milestones/issues likely affected.
 2. Tell the user which future milestones may now have stale plans and suggest running `/n8-replan`.
+
+Background work (shells, monitors, background subagents) follows `reference/background.md` in the n8SDLC plugin. Every launch is bounded and announced with what it's for and when it should finish. Overdue work is checked, not waited on. A turn never ends with work still running unless the reply names it. `/n8-subs` lists everything live.
 
 Separately: if a `/n8-*` skill's own instructions failed, misled you, or were silent on something this session, tell the user and offer `/n8-feedback` — it packages the learning as an issue on the plugin repo, stripped of project specifics, and sends nothing until the user has reviewed the exact text.
 ```

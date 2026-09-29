@@ -1,0 +1,15 @@
+name: tests
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  scripts:
+    # Layer 1: deterministic script tests (tests/run.sh). The behaviour evals (n8SDLC/evals) cost
+    # API usage and run locally before each release, not here.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: tests/run.sh
