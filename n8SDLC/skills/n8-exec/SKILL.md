@@ -116,6 +116,10 @@ After all targeted milestones:
 - Every blocker with its question and options, and which stories it holds up.
 - Next step: verification of the executed targets — or, if blockers exist, say so and ask the user to answer them (comment on the issues or reply here), in which case the Next line is `/n8-exec` for the affected milestones instead.
 
-> ➡ Next: /n8-verify M1
+For token efficiency in multi-milestone runs, clear context before verification:
 
-**End on the Next line.** The reply's final line is `➡ Next: /n8-verify M1` (an example — substitute the real command and arguments): one recommended command, alone on the line, nothing after it. The why and any alternatives go in the sentence above it, never appended to it. Claude Code's prompt suggestion reads the transcript; a bare, final, unambiguous command is what lets the user accept it with Tab.
+> ➡ Next: /clear
+
+Then: `/n8-verify M1`
+
+**End on the Next line.** The reply's final line is `➡ Next: /clear` (or `/n8-verify M1` if running single milestone without context concern): one recommended command, alone on the line, nothing after it. The why and any alternatives go in the sentence above it, never appended to it. Claude Code's prompt suggestion reads the transcript; a bare, final, unambiguous command is what lets the user accept it with Tab. For automated multi-milestone orchestration, use `/n8-workflow M0,M1,M2` instead, which handles exec→verify→retry loops with automatic clearing.

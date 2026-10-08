@@ -70,6 +70,10 @@ When a closed milestone represents shippable value (feature milestones especiall
 
 Report per milestone: verified AC count, evidence highlights, manual steps awaiting the user (if any), bugs filed, closed or still open and why — honestly; a milestone that limps through is reported as such. Pick the single next step — a fix pass (`/n8-exec` on the milestone with filed bugs), remaining verifications, `/n8-release` when the closed milestone is shippable, the next `/n8-exec`, or `/n8-audit` if all feature milestones are done — and end:
 
-> ➡ Next: /n8-exec M2
+For token efficiency before the next phase, suggest clearing context:
 
-**End on the Next line.** The reply's final line is `➡ Next: /n8-exec M2` (an example — substitute the real command and arguments): one recommended command, alone on the line, nothing after it. The why and any alternatives go in the sentence above it, never appended to it. Claude Code's prompt suggestion reads the transcript; a bare, final, unambiguous command is what lets the user accept it with Tab.
+> ➡ Next: /clear
+
+Then: `/n8-exec M2` (or `/n8-release` if milestone is closed and shippable)
+
+**End on the Next line.** The reply's final line is `➡ Next: /clear` (or the direct next step if running single milestone without context concern): one recommended command, alone on the line, nothing after it. The why and any alternatives go in the sentence above it, never appended to it. Claude Code's prompt suggestion reads the transcript; a bare, final, unambiguous command is what lets the user accept it with Tab. For automated multi-milestone orchestration, use `/n8-workflow M0,M1,M2` instead, which handles exec→verify→retry loops with automatic clearing.

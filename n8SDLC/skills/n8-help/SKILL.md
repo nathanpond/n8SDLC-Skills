@@ -22,6 +22,7 @@ Open and close with the one thing the user should remember:
 | `/n8-replan` | Reconciles stale plans after ad-hoc changes (evidence: decision ledger, git history, codebase); proposes updates, applies on approval. |
 | `/n8-exec M1` | Executes planned milestones autonomously (`M1,M2`, `*`): milestone branch + PR, tests passing, decisions logged, blockers marked and skipped. |
 | `/n8-verify` | Verifies executed milestones against acceptance criteria (`--auto` agent-verifies; `--testplan` walks you through UAT). Passing verify is what closes a milestone. |
+| `/n8-workflow M1,M2` | Orchestrate full exec→verify→retry loops for multiple milestones with automatic context clearing — runs each milestone through complete cycles, re-executing and re-verifying bugs until they pass or max retries (default 5) are exhausted. |
 | `/n8-release` | Tags a verified commit on main, creates the GitHub release, and watches whatever the tag triggers (prod deploy, publish). Never runs unasked. |
 | `/n8-audit` | Audit suite: security, authorization, stability, performance, cleanup, 508, tests, integration, docs (skills/wiki/CLAUDE.md checked against the code). Findings are verified, severity-rated, and filed on your approval. |
 | `/n8-wiki` | Reconciles the whole wiki against the backlog and codebase. Honest tone; applies updates, then summarizes. |
