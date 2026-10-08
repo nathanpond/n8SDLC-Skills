@@ -57,11 +57,12 @@ Claude Code will prompt to trust the marketplace on first use.
 /n8-init        → answers a few setup questions, scaffolds the shell project, wires everything
 /n8-roadmap     → describe the goal and features; get epics + a milestone skeleton
 /n8-plan *      → deep Q&A now so execution never asks; full backlog created
-/n8-exec *      → walk away; it builds, tests, and merges milestone by milestone
-/n8-verify      → adversarial check against the plan's own truths; closes what passes
+/n8-workflow *  → unattended multi-milestone build: executes, verifies, auto-retries bugs up to 5x, clears context between phases
 /n8-audit       → the audit suite, then /n8-exec the fixes
 /n8-release     → tag a verified commit; ship
 ```
+
+For single milestones or manual workflow: `/n8-exec M0` → `/clear` → `/n8-verify M0` → `/clear` → next milestone.
 
 **Existing codebase:** same flow, but run `/n8-map` between init and roadmap — four parallel agents document the stack, architecture, conventions, and concerns (concerns become backlog issues), so planning happens against what's actually there. Init also scans for pre-existing homegrown workflows and reconciles them with your approval instead of clobbering them.
 
@@ -78,6 +79,7 @@ Claude Code will prompt to trust the marketplace on first use.
 | `/n8-replan` | Repair plans that drifted from reality; propose-then-apply. |
 | `/n8-exec` | Execute planned milestones autonomously (`M0`, `M1,M2`, `*`). |
 | `/n8-verify` | Adversarial verification against AC and must-haves (`--auto` / `--testplan`); closes milestones. |
+| `/n8-workflow` | Orchestrate multi-milestone exec→verify→retry loops with automatic context clearing (default 5 retries, `--max-retries=N`, `--no-auto`, `--no-clear`). |
 | `/n8-audit` | Security, authorization, stability, performance, cleanup, 508, tests, integration — fingerprinted findings. |
 | `/n8-release` | Tag a verified commit on main; notes from merged PRs; watch what the tag triggers. |
 | `/n8-wiki` | Reconcile the whole wiki against backlog + code, honestly. |

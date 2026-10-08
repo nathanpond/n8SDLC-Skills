@@ -17,6 +17,7 @@ Decisions made 2026-08-27 while designing this skill suite. This is the record o
 - Preconditions are hard stops: unplanned milestone, or earlier milestone unexecuted.
 - Blockers (legitimately unsure + high cost of wrong): **skip, mark `blocked`, continue** with non-dependent work; surface all at the end. Low-cost calls are made and logged, not asked.
 - All decisions logged to `.n8/decisions.md` and displayed after execution.
+- **Multi-milestone orchestration:** `/n8-workflow M0,M1,M2` runs each milestone through exec→verify→auto-retry loops with automatic context clearing (disabled with `--no-clear`). Default: 5 retries per milestone (`--max-retries=N` to override); `--no-auto` skips retry logic and returns for user decision. Solves token bloat in large-project autonomous runs.
 
 ## Drift and replanning
 - Ad-hoc changes between planning and execution are captured in a **drift ledger**: `## Ad-hoc` entries in `.n8/decisions.md`, written by any agent session via a CLAUDE.md instruction that `/n8-init` installs.
