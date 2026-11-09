@@ -17,7 +17,7 @@ Decisions made 2026-08-27 while designing this skill suite. This is the record o
 - Preconditions are hard stops: unplanned milestone, or earlier milestone unexecuted.
 - Blockers (legitimately unsure + high cost of wrong): **skip, mark `blocked`, continue** with non-dependent work; surface all at the end. Low-cost calls are made and logged, not asked.
 - All decisions logged to `.n8/decisions.md` and displayed after execution.
-- **Multi-milestone orchestration:** `/n8-workflow M0,M1,M2` runs each milestone through exec→verify→auto-retry loops with automatic context clearing (disabled with `--no-clear`). Default: 5 retries per milestone (`--max-retries=N` to override); `--no-auto` skips retry logic and returns for user decision. Solves token bloat in large-project autonomous runs.
+- **Multi-milestone orchestration:** `/n8-workflow M0,M1,M2` runs each milestone through exec→verify→auto-retry loops with automatic context clearing (disabled with `--no-clear`). Default: 5 retries per milestone (`--max-retries=N` to override); `--no-auto` skips retry logic and returns for user decision. Solves token bloat in large-project autonomous runs. A retry runs only if something actionable is left and the last round moved `main`; outcomes are passed / blocked on owner / stalled / failed after N (0.9.0, #19).
 
 ## Drift and replanning
 - Ad-hoc changes between planning and execution are captured in a **drift ledger**: `## Ad-hoc` entries in `.n8/decisions.md`, written by any agent session via a CLAUDE.md instruction that `/n8-init` installs.
@@ -168,3 +168,16 @@ Trimmed middle path (decided 2026-08-27 after the label-philosophy discussion): 
   - the session-start hook suggests `/n8-upgrade`;
   - the roadmap's first turn is one focused batch, with no coverage question for runtime data.
 - Evals can't reach GitHub (no shell network, and no PATH stubs reach the agent), so GitHub-dependent behaviour (the delivery baseline, milestone numbering) stays covered by live runs against the kept demo repo, read-only.
+
+## Field reports from 0.8.0 (decided 2026-11-08, 0.9.0)
+
+All eight open field reports (#13–#20) were accepted; most were adapted rather than taken verbatim.
+
+- **Re-verify skip rule (#13).** Every story row in a verification record names the commit it was verified at. On a re-verify, a story is skipped only if that commit is recorded and the diff to the verify commit doesn't touch its must-have artifacts, its tests, or files changed by its bugs' fix PRs. A record without a commit counts as no record. **Why:** "a record exists" stood in for "verified against the code that ships", and a fix pass broke a story's own AC unseen. Re-verifying everything every time was rejected because it multiplies `/n8-workflow`'s cost for untouched stories.
+- **Verify commit (#14).** The latest commit on `main` that closed any milestone issue, found from each issue's close event over GraphQL, plus the milestone PRs' merges. Out-of-pattern closers are named and diff-checked in the milestone record. A milestone search was rejected (it misses PRs nobody assigned), and so was `main`'s head by default (it mixes in later milestones).
+- **Per-story full suite (#15).** `exec.full_suite: sequential | pipelined`, default sequential. Pipelined runs a targeted set (own tests, tests that read a changed file, lint/types) before moving on, then the full suite in a background worktree at the story's SHA, at most two at once. AC wait for that run, and a red run drains the pipeline. **Batched mode was rejected:** the field data showed it losing time once stories added shared test infrastructure, and failures stopped naming their story. Opt-in because only the project knows whether its tests can run concurrently.
+- **Draft PRs (#16).** A milestone PR is a draft only when a run held it, with a `Hold:` decision-log entry saying what lifts it. The merge step reads the hold whether or not the PR is a draft (plans without drafts hold by entry alone). A draft with no recorded hold is a blocker: it's the user's signal.
+- **Linked issues around the merge (#17).** Before the merge, `closingIssuesReferences` must be a subset of completed work, and the squash gets an explicit body with only those `Closes` lines, so commit-body keywords can't reach `main`. After the merge, wait (bounded) for GitHub's asynchronous closes before the reopen check. **Why:** the old check ran before the closes landed and read green either way.
+- **`--add-parent` (#18).** The flag doesn't exist; `--parent`, with a read-back.
+- **Workflow retry loop (#19).** See Execution above. Also removed a mid-run "ask user" step that contradicted the no-questions rule.
+- **CI pending budget (#20).** max(30 min, 1.5 × the longest check on the last merged milestone PR); 60 min with no history. Stuck means queued with nothing running for 10 minutes, or running past the budget. After ~5 minutes of ticks, one bounded background wait replaces tick-polling.

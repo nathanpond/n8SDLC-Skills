@@ -12,6 +12,10 @@ The canonical text for every installed artifact lives where init defines it. Thi
 
 - **`exec.full_suite:` in `.n8/config.yml`.** Check: the key exists. Fix: add `exec:` → `full_suite: sequential` (the pre-0.9 behaviour; absent also means sequential, so this only makes the choice visible). Mention `pipelined` and its requirement — tests safe to run concurrently — and let the user switch; never switch it for them. Memory sweep: a project memory or decision that set up a batched full-suite gate (one run per group of stories) now conflicts with `/n8-exec`, so flag it.
 
+## 0.8.0
+
+- No project-side changes (`/n8-workflow` is skill behaviour only).
+
 ## 0.7.0
 
 - **`plugin_version:` in `.n8/config.yml`.** Check: the key exists. Fix: `/n8-upgrade` writes it last, after everything else passed. A project without it is treated as older than every entry, so every check below runs.

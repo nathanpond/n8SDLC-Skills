@@ -57,7 +57,7 @@ Claude Code will prompt to trust the marketplace on first use.
 /n8-init        → answers a few setup questions, scaffolds the shell project, wires everything
 /n8-roadmap     → describe the goal and features; get epics + a milestone skeleton
 /n8-plan *      → deep Q&A now so execution never asks; full backlog created
-/n8-workflow *  → unattended multi-milestone build: executes, verifies, auto-retries bugs up to 5x, clears context between phases
+/n8-workflow *  → unattended multi-milestone build: executes, verifies, auto-retries bugs up to 5x (stopping early when every open bug waits on you), clears context between phases
 /n8-audit       → the audit suite, then /n8-exec the fixes
 /n8-release     → tag a verified commit; ship
 ```
@@ -79,7 +79,7 @@ For single milestones or manual workflow: `/n8-exec M0` → `/clear` → `/n8-ve
 | `/n8-replan` | Repair plans that drifted from reality; propose-then-apply. |
 | `/n8-exec` | Execute planned milestones autonomously (`M0`, `M1,M2`, `*`). |
 | `/n8-verify` | Adversarial verification against AC and must-haves (`--auto` / `--testplan`); closes milestones. |
-| `/n8-workflow` | Orchestrate multi-milestone exec→verify→retry loops with automatic context clearing (default 5 retries, `--max-retries=N`, `--no-auto`, `--no-clear`). |
+| `/n8-workflow` | Orchestrate multi-milestone exec→verify→retry loops with automatic context clearing (default 5 retries, `--max-retries=N`, `--no-auto`, `--no-clear`). Stops a milestone early when it's blocked on you or a round makes no progress. |
 | `/n8-audit` | Security, authorization, stability, performance, cleanup, 508, tests, integration — fingerprinted findings. |
 | `/n8-release` | Tag a verified commit on main; notes from merged PRs; watch what the tag triggers. |
 | `/n8-wiki` | Reconcile the whole wiki against backlog + code, honestly. |
