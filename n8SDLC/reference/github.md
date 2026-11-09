@@ -238,6 +238,36 @@ gh pr checks 41 --json bucket --jq '[.[].bucket] | unique'; date -u +%H:%M:%S
 
 The last line is the verdict, read as a set, never as an exit code (with `--json`, `gh` exits 0 on a red check; without it, 1 — and 1 for a typo'd PR number): `["pass"]` or with `"skipping"` → green; any `"fail"` → red; any `"pending"` → not yet; any `"cancel"` → re-run the workflow, don't "fix"; `[]` or `no checks reported` → nothing registered. The `| jq -e` inside the loop is the intended gate — jq's status *is* the signal — which is why this pipe is fine where `git push | tail` is not. Never add `2>/dev/null`: an auth or network error must be visible on the first tick, not after the budget.
 
+**The pending budget is derived, not fixed.** A project whose normal CI takes 45 minutes is healthy at minute 31, so the limit comes from the same jobs' recent history:
+
+```bash
+PREV=$(gh pr list -R $R --state merged --search "head:milestone/m" --json number,mergedAt --jq 'sort_by(.mergedAt) | last | .number // empty')
+LONGEST=$( [ -n "$PREV" ] && gh pr checks $PREV -R $R --json startedAt,completedAt --jq '[.[] | select(.completedAt > .startedAt) | ((.completedAt|fromdate) - (.startedAt|fromdate))] | (max // 0) / 60 | ceil' || echo 0)
+BUDGET=$( [ -n "$PREV" ] && echo $(( LONGEST * 3 / 2 > 30 ? LONGEST * 3 / 2 : 30 )) || echo 60 )   # minutes
+```
+
+Budget = max(30 min, 1.5 × the longest check on the last merged milestone PR). With no earlier milestone PR, it's 60 min: the first milestone is where CI is least known. It tells *slow* from *stuck* in two ways:
+
+- **Queued, nothing running:** checks still `QUEUED` with nothing `IN_PROGRESS` for 10 minutes → blocker "no runner picked up the checks". That's stuck, whatever the budget says.
+- **Running past the budget:** checks `IN_PROGRESS` past `BUDGET` minutes from the first tick → blocker naming each pending check, how long it has run, and the historical figure the budget came from.
+
+**Long waits go to the background.** The ticks above catch fast results and the two races. After about 5 minutes of `pending`, stop ticking (a 45-minute run would cost ~27 tool calls of context) and launch one bounded background command per `reference/background.md`, with `REMAINING` set to the budget minus the time already waited:
+
+```bash
+end=$((SECONDS + REMAINING * 60)); busy=$SECONDS
+while :; do
+  s=$(gh pr checks 41 --json bucket,state)
+  echo "$s" | jq -e 'length > 0 and all(.bucket != "pending")' >/dev/null && { echo DONE; break; }
+  echo "$s" | jq -e 'any(.[]; .state == "IN_PROGRESS")' >/dev/null && busy=$SECONDS
+  [ $((SECONDS - busy)) -ge 600 ] && { echo "STUCK: queued 10m, nothing in progress"; break; }
+  [ $SECONDS -ge $end ] && { echo "BUDGET exceeded"; break; }
+  sleep 30
+done
+gh pr checks 41 --json name,bucket,state,startedAt --jq '.[] | "\(.bucket) \(.state) \(.name) \(.startedAt)"'; date -u +%H:%M:%S
+```
+
+`DONE` → read the final lines as the same set verdict. `STUCK` or `BUDGET exceeded` → the blockers above. When `BUDGET` is above 30, log it and where it came from in `.n8/decisions.md`, so a long wait has a visible reason.
+
 Keep `gh` output short in context (`--jq` projections, `--json` with only the fields needed) — long runs die by context, not by errors — but never *discard* output a later step might need: capture to a file first, then trim what you read (`/n8-exec` has the form). **Never pipe a command whose success gates a close** (`git push 2>&1 | tail -1` returns `tail`'s status and reports failure as success) — run it bare, or `set -o pipefail` in the same invocation.
 
 **Non-TTY note:** `gh issue view <n> --comments` printed nothing outside a TTY on gh 2.6x–2.7x; current versions print. `--json title,body,comments` is reliable on all of them. In autonomous runs, read issues with `--json title,body,comments`.
