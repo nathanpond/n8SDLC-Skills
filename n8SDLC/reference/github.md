@@ -61,7 +61,9 @@ Use the native CLI flags (gh ≥ 2.94.0) — they're the proven path:
 
 ```bash
 gh issue create --title "..." --body-file /tmp/body.md --label feature --parent $EPIC_NUM
-gh issue edit $CHILD_NUM --add-parent $EPIC_NUM        # attach after the fact
+gh issue edit $CHILD_NUM --parent $EPIC_NUM            # attach after the fact (there is no --add-parent)
+gh api repos/$R/issues/$CHILD_NUM/parent --jq .number  # read it back: must print $EPIC_NUM
+gh issue edit $EPIC_NUM --add-sub-issue 123,124        # parent side: attach several children in one call
 gh api repos/$R/issues/$PARENT_NUM/sub_issues          # read children
 ```
 
